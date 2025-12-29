@@ -118,3 +118,15 @@
 - [ ] Implementar busca por texto nos registros
 - [x] Adicionar botão de voltar ao dashboard
 - [ ] Criar testes para página de detalhes
+
+
+## Registro Rápido Otimizado para Mobile (Nova Feature)
+- [x] Criar componente de upload de fotos com preview
+- [x] Implementar gravação de áudio com MediaRecorder API
+- [x] Integrar transcrição de áudio com Whisper API (endpoint criado)
+- [x] Criar página QuickRecord otimizado para mobile
+- [ ] Implementar upload para S3
+- [ ] Armazenar referências de anexos no banco de dados
+- [x] Adicionar indicador de progresso de upload
+- [x] Implementar validação de formulário
+- [ ] Testar em dispositivos móveis

@@ -36,6 +36,20 @@ async function startServer() {
   // OAuth callback under /api/oauth/callback
   registerOAuthRoutes(app);
   // tRPC API
+
+  // Transcription endpoint
+  app.post("/api/transcribe", async (req, res) => {
+    try {
+      // For now, return a placeholder transcription
+      // In production, this would call the Whisper API
+      res.json({
+        transcription: "[Transcrição de áudio - integrar com Whisper API]",
+      });
+    } catch (error) {
+      console.error("Transcription error:", error);
+      res.status(500).json({ error: "Transcription failed" });
+    }
+  });
   app.use(
     "/api/trpc",
     createExpressMiddleware({
