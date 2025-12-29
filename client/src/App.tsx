@@ -24,6 +24,7 @@ import ScheduledReports from "./pages/ScheduledReports";
 import Integrations from "./pages/Integrations";
 import Alerts from "./pages/Alerts";
 import DashboardOverview from "./pages/DashboardOverview";
+import ServiceProviders from "./pages/ServiceProviders";
 
 function Router() {
   const { isAuthenticated, loading } = useAuth();
@@ -71,6 +72,8 @@ function Router() {
         <Route path={"/alerts"} component={Alerts} />
         <Route path={"/visao-geral"} component={DashboardOverview} />
         <Route path={"/overview"} component={DashboardOverview} />
+        <Route path={"/prestadores"} component={ServiceProviders} />
+        <Route path={"/service-providers"} component={ServiceProviders} />
        <Route path={"/404"} component={NotFound} />
         <Route component={NotFound} />
       </Switch>

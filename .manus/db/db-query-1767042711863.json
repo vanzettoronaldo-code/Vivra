@@ -1,0 +1,9 @@
+{
+  "query": "CREATE TABLE IF NOT EXISTS `service_providers` (\n  `id` int AUTO_INCREMENT NOT NULL,\n  `companyId` int NOT NULL,\n  `name` varchar(255) NOT NULL,\n  `type` enum('manutencao','limpeza','seguranca','eletrica','hidraulica','climatizacao','jardinagem','outros') NOT NULL,\n  `email` varchar(320),\n  `phone` varchar(20),\n  `document` varchar(20),\n  `address` text,\n  `rating` decimal(2,1) DEFAULT '0.0',\n  `totalServices` int NOT NULL DEFAULT 0,\n  `isActive` boolean NOT NULL DEFAULT true,\n  `notes` text,\n  `createdAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,\n  `updatedAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,\n  CONSTRAINT `service_providers_id` PRIMARY KEY(`id`)\n);",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4BCkJEev24JMwve.root --database 6E78f2XtpdcnWJdcz797eT --execute CREATE TABLE IF NOT EXISTS `service_providers` (\n  `id` int AUTO_INCREMENT NOT NULL,\n  `companyId` int NOT NULL,\n  `name` varchar(255) NOT NULL,\n  `type` enum('manutencao','limpeza','seguranca','eletrica','hidraulica','climatizacao','jardinagem','outros') NOT NULL,\n  `email` varchar(320),\n  `phone` varchar(20),\n  `document` varchar(20),\n  `address` text,\n  `rating` decimal(2,1) DEFAULT '0.0',\n  `totalServices` int NOT NULL DEFAULT 0,\n  `isActive` boolean NOT NULL DEFAULT true,\n  `notes` text,\n  `createdAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,\n  `updatedAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,\n  CONSTRAINT `service_providers_id` PRIMARY KEY(`id`)\n);",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 265
+}

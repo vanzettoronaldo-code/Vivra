@@ -1,6 +1,6 @@
 import { eq, and, desc, or, gte, lte, like, count } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
-import { InsertUser, users, companies, assets, timelineRecords, attachments, recurrenceAnalysis, alerts, auditLogs, emailNotifications } from "../drizzle/schema";
+import { InsertUser, users, companies, assets, timelineRecords, attachments, recurrenceAnalysis, alerts, auditLogs, emailNotifications, serviceProviders, services, InsertServiceProvider, InsertService } from "../drizzle/schema";
 import { ENV } from './_core/env';
 
 let _db: ReturnType<typeof drizzle> | null = null;
@@ -751,4 +751,131 @@ export async function getCompanyTimelineStats(companyId: number) {
   });
 
   return stats;
+}
+
+
+// ==================== SERVICE PROVIDERS ====================
+
+export async function getServiceProvidersByCompany(companyId: number) {
+  const db = await getDb();
+  if (!db) return [];
+  
+  return db.select().from(serviceProviders).where(eq(serviceProviders.companyId, companyId)).orderBy(desc(serviceProviders.createdAt));
+}
+
+export async function getServiceProviderById(id: number) {
+  const db = await getDb();
+  if (!db) return null;
+  
+  const result = await db.select().from(serviceProviders).where(eq(serviceProviders.id, id)).limit(1);
+  return result[0] || null;
+}
+
+export async function createServiceProvider(data: InsertServiceProvider) {
+  const db = await getDb();
+  if (!db) return null;
+  
+  const result = await db.insert(serviceProviders).values(data);
+  return { id: result[0].insertId, ...data };
+}
+
+export async function updateServiceProvider(id: number, data: Partial<InsertServiceProvider>) {
+  const db = await getDb();
+  if (!db) return null;
+  
+  await db.update(serviceProviders).set(data).where(eq(serviceProviders.id, id));
+  return getServiceProviderById(id);
+}
+
+export async function deleteServiceProvider(id: number) {
+  const db = await getDb();
+  if (!db) return false;
+  
+  await db.delete(serviceProviders).where(eq(serviceProviders.id, id));
+  return true;
+}
+
+// ==================== SERVICES ====================
+
+export async function getServicesByCompany(companyId: number) {
+  const db = await getDb();
+  if (!db) return [];
+  
+  return db.select().from(services).where(eq(services.companyId, companyId)).orderBy(desc(services.createdAt));
+}
+
+export async function getServicesByProvider(providerId: number) {
+  const db = await getDb();
+  if (!db) return [];
+  
+  return db.select().from(services).where(eq(services.providerId, providerId)).orderBy(desc(services.createdAt));
+}
+
+export async function getServiceById(id: number) {
+  const db = await getDb();
+  if (!db) return null;
+  
+  const result = await db.select().from(services).where(eq(services.id, id)).limit(1);
+  return result[0] || null;
+}
+
+export async function createService(data: InsertService) {
+  const db = await getDb();
+  if (!db) return null;
+  
+  const result = await db.insert(services).values(data);
+  
+  // Update provider's total services count
+  await db.update(serviceProviders)
+    .set({ totalServices: count(services.id) })
+    .where(eq(serviceProviders.id, data.providerId));
+  
+  return { id: result[0].insertId, ...data };
+}
+
+export async function updateService(id: number, data: Partial<InsertService>) {
+  const db = await getDb();
+  if (!db) return null;
+  
+  await db.update(services).set(data).where(eq(services.id, id));
+  return getServiceById(id);
+}
+
+export async function deleteService(id: number) {
+  const db = await getDb();
+  if (!db) return false;
+  
+  await db.delete(services).where(eq(services.id, id));
+  return true;
+}
+
+export async function getServiceStatsByProvider(providerId: number) {
+  const db = await getDb();
+  if (!db) return { total: 0, pendente: 0, andamento: 0, aprovado: 0, rejeitado: 0 };
+  
+  const allServices = await db.select().from(services).where(eq(services.providerId, providerId));
+  
+  return {
+    total: allServices.length,
+    pendente: allServices.filter(s => s.status === 'pendente').length,
+    andamento: allServices.filter(s => s.status === 'andamento').length,
+    aprovado: allServices.filter(s => s.status === 'aprovado').length,
+    rejeitado: allServices.filter(s => s.status === 'rejeitado').length,
+  };
+}
+
+export async function getProvidersWithStats(companyId: number) {
+  const db = await getDb();
+  if (!db) return [];
+  
+  const providers = await db.select().from(serviceProviders).where(eq(serviceProviders.companyId, companyId)).orderBy(desc(serviceProviders.createdAt));
+  
+  const providersWithStats = await Promise.all(
+    providers.map(async (provider) => {
+      const stats = await getServiceStatsByProvider(provider.id);
+      return { ...provider, stats };
+    })
+  );
+  
+  return providersWithStats;
 }

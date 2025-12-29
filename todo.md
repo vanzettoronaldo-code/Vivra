@@ -342,3 +342,15 @@
 - [x] Adicionar gráficos de tendências (distribuição por categoria)
 - [x] Adicionar rota e link no menu
 - [x] Testar a página
+
+
+## Página de Prestadores de Serviços (Solicitado pelo usuário)
+- [x] Criar tabela de prestadores no banco de dados (service_providers)
+- [x] Criar tabela de serviços prestados (services)
+- [x] Criar procedures tRPC para CRUD de prestadores
+- [x] Criar página ServiceProviders.tsx com listagem
+- [x] Implementar filtros por tipo e status
+- [x] Adicionar modal para criar/editar prestador
+- [x] Adicionar dados de exemplo no banco (8 prestadores, 15 serviços)
+- [x] Adicionar rota e link no menu
+- [x] Testar a página

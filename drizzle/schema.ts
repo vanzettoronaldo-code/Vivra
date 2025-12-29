@@ -223,3 +223,51 @@ export const emailNotifications = mysqlTable("email_notifications", {
 
 export type EmailNotification = typeof emailNotifications.$inferSelect;
 export type InsertEmailNotification = typeof emailNotifications.$inferInsert;
+
+
+/**
+ * Service Providers - Prestadores de serviços
+ */
+export const serviceProviders = mysqlTable("service_providers", {
+  id: int("id").autoincrement().primaryKey(),
+  companyId: int("companyId").notNull(),
+  name: varchar("name", { length: 255 }).notNull(),
+  type: mysqlEnum("type", ["manutencao", "limpeza", "seguranca", "eletrica", "hidraulica", "climatizacao", "jardinagem", "outros"]).notNull(),
+  email: varchar("email", { length: 320 }),
+  phone: varchar("phone", { length: 20 }),
+  document: varchar("document", { length: 20 }), // CNPJ ou CPF
+  address: text("address"),
+  rating: decimal("rating", { precision: 2, scale: 1 }).default("0.0"),
+  totalServices: int("totalServices").default(0).notNull(),
+  isActive: boolean("isActive").default(true).notNull(),
+  notes: text("notes"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type ServiceProvider = typeof serviceProviders.$inferSelect;
+export type InsertServiceProvider = typeof serviceProviders.$inferInsert;
+
+/**
+ * Services - Serviços prestados
+ */
+export const services = mysqlTable("services", {
+  id: int("id").autoincrement().primaryKey(),
+  companyId: int("companyId").notNull(),
+  providerId: int("providerId").notNull(),
+  assetId: int("assetId"), // Ativo relacionado (opcional)
+  title: varchar("title", { length: 255 }).notNull(),
+  description: text("description"),
+  status: mysqlEnum("status", ["pendente", "andamento", "aprovado", "rejeitado"]).default("pendente").notNull(),
+  priority: mysqlEnum("priority", ["baixa", "media", "alta", "urgente"]).default("media").notNull(),
+  scheduledDate: timestamp("scheduledDate"),
+  completedDate: timestamp("completedDate"),
+  cost: decimal("cost", { precision: 10, scale: 2 }),
+  rating: int("rating"), // 1-5 stars
+  feedback: text("feedback"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type Service = typeof services.$inferSelect;
+export type InsertService = typeof services.$inferInsert;

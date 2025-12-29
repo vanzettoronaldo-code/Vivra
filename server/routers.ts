@@ -26,6 +26,18 @@ import {
   getUserPreferences,
   getRecurrenceAnalysisByCompanyId,
   getCompanyTimelineStats,
+  getServiceProvidersByCompany,
+  getServiceProviderById,
+  createServiceProvider,
+  updateServiceProvider,
+  deleteServiceProvider,
+  getServicesByCompany,
+  getServicesByProvider,
+  getServiceById,
+  createService,
+  updateService,
+  deleteService,
+  getProvidersWithStats,
 } from "./db";
 import { TRPCError } from "@trpc/server";
 
@@ -418,6 +430,122 @@ export const appRouter = router({
         return { success: true };
       }),
   }),
-});
 
+  /**
+   * Service Providers procedures
+   */
+  serviceProvider: router({
+    list: protectedProcedure.query(async ({ ctx }) => {
+      if (!ctx.user.companyId) throw new TRPCError({ code: "UNAUTHORIZED", message: "User must belong to a company" });
+      return getProvidersWithStats(ctx.user.companyId);
+    }),
+    
+    getById: protectedProcedure
+      .input(z.object({ id: z.number() }))
+      .query(async ({ input }) => {
+        return getServiceProviderById(input.id);
+      }),
+    
+    create: protectedProcedure
+      .input(z.object({
+        name: z.string().min(1),
+        type: z.enum(["manutencao", "limpeza", "seguranca", "eletrica", "hidraulica", "climatizacao", "jardinagem", "outros"]),
+        email: z.string().email().optional(),
+        phone: z.string().optional(),
+        document: z.string().optional(),
+        address: z.string().optional(),
+        notes: z.string().optional(),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        if (!ctx.user.companyId) throw new TRPCError({ code: "UNAUTHORIZED", message: "User must belong to a company" });
+        return createServiceProvider({ ...input, companyId: ctx.user.companyId });
+      }),
+    
+    update: protectedProcedure
+      .input(z.object({
+        id: z.number(),
+        name: z.string().min(1).optional(),
+        type: z.enum(["manutencao", "limpeza", "seguranca", "eletrica", "hidraulica", "climatizacao", "jardinagem", "outros"]).optional(),
+        email: z.string().email().optional(),
+        phone: z.string().optional(),
+        document: z.string().optional(),
+        address: z.string().optional(),
+        notes: z.string().optional(),
+        isActive: z.boolean().optional(),
+        rating: z.string().optional(),
+      }))
+      .mutation(async ({ input }) => {
+        const { id, ...data } = input;
+        return updateServiceProvider(id, data);
+      }),
+    
+    delete: protectedProcedure
+      .input(z.object({ id: z.number() }))
+      .mutation(async ({ input }) => {
+        return deleteServiceProvider(input.id);
+      }),
+  }),
+
+  /**
+   * Services procedures
+   */
+  service: router({
+    list: protectedProcedure.query(async ({ ctx }) => {
+      if (!ctx.user.companyId) throw new TRPCError({ code: "UNAUTHORIZED", message: "User must belong to a company" });
+      return getServicesByCompany(ctx.user.companyId);
+    }),
+    
+    listByProvider: protectedProcedure
+      .input(z.object({ providerId: z.number() }))
+      .query(async ({ input }) => {
+        return getServicesByProvider(input.providerId);
+      }),
+    
+    getById: protectedProcedure
+      .input(z.object({ id: z.number() }))
+      .query(async ({ input }) => {
+        return getServiceById(input.id);
+      }),
+    
+    create: protectedProcedure
+      .input(z.object({
+        providerId: z.number(),
+        assetId: z.number().optional(),
+        title: z.string().min(1),
+        description: z.string().optional(),
+        status: z.enum(["pendente", "andamento", "aprovado", "rejeitado"]).optional(),
+        priority: z.enum(["baixa", "media", "alta", "urgente"]).optional(),
+        scheduledDate: z.date().optional(),
+        cost: z.string().optional(),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        if (!ctx.user.companyId) throw new TRPCError({ code: "UNAUTHORIZED", message: "User must belong to a company" });
+        return createService({ ...input, companyId: ctx.user.companyId });
+      }),
+    
+    update: protectedProcedure
+      .input(z.object({
+        id: z.number(),
+        title: z.string().min(1).optional(),
+        description: z.string().optional(),
+        status: z.enum(["pendente", "andamento", "aprovado", "rejeitado"]).optional(),
+        priority: z.enum(["baixa", "media", "alta", "urgente"]).optional(),
+        scheduledDate: z.date().optional(),
+        completedDate: z.date().optional(),
+        cost: z.string().optional(),
+        rating: z.number().min(1).max(5).optional(),
+        feedback: z.string().optional(),
+      }))
+      .mutation(async ({ input }) => {
+        const { id, ...data } = input;
+        return updateService(id, data);
+      }),
+    
+    delete: protectedProcedure
+      .input(z.object({ id: z.number() }))
+      .mutation(async ({ input }) => {
+        return deleteService(input.id);
+      }),
+  }),
+});
 export type AppRouter = typeof appRouter;

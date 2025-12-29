@@ -15,7 +15,7 @@ import {
 } from "@/components/ui/sidebar";
 import { getLoginUrl } from "@/const";
 import { useIsMobile } from "@/hooks/useMobile";
-import { LayoutDashboard, LogOut, PanelLeft, Users, Globe, BarChart3, Plus, CheckSquare, Lightbulb, Users2, Settings, TrendingUp, FileText, Plug, Bell, Building2, Home } from "lucide-react";
+import { LayoutDashboard, LogOut, PanelLeft, Users, Globe, BarChart3, Plus, CheckSquare, Lightbulb, Users2, Settings, TrendingUp, FileText, Plug, Bell, Building2, Home, Briefcase } from "lucide-react";
 import { NotificationBell } from "./NotificationCenter";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { CSSProperties, useEffect, useRef, useState } from "react";
@@ -29,6 +29,7 @@ const menuItems = [
   { icon: Building2, label: "ATIVOS", path: "/" },
   { icon: Plus, label: "+ NOVOS REGISTROS", path: "/quick-record" },
   { icon: CheckSquare, label: "APROVACOES", path: "/approval-notifications" },
+  { icon: Briefcase, label: "PRESTADORES", path: "/prestadores" },
   { icon: Lightbulb, label: "INTELIGENCIA", path: "/inteligencia" },
   { icon: TrendingUp, label: "METRICAS", path: "/metricas" },
   { icon: FileText, label: "RELATORIOS", path: "/relatorios-agendados" },
