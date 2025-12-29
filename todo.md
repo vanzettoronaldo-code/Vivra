@@ -106,3 +106,15 @@
 - [x] Dashboard corrigido e funcionando
 - [x] Corrigir erro UNAUTHORIZED quando companyId é null
 - [x] Corrigir função upsertUser para suportar companyId e userRole
+
+
+## Visualização de Linha do Tempo (Nova Feature)
+- [x] Criar página de detalhes do ativo (AssetDetailPage)
+- [x] Implementar navegação ao clicar no ativo
+- [x] Exibir informações completas do ativo
+- [x] Listar registros históricos com paginação
+- [x] Adicionar filtros por categoria na página de detalhes
+- [x] Adicionar filtros por data na página de detalhes
+- [ ] Implementar busca por texto nos registros
+- [x] Adicionar botão de voltar ao dashboard
+- [ ] Criar testes para página de detalhes

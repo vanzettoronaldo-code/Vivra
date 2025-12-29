@@ -4,20 +4,54 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { ArrowLeft, Plus } from "lucide-react";
 import TimelineView from "@/components/TimelineView";
+import TimelineFilters, { TimelineFilterState } from "@/components/TimelineFilters";
+import { useState } from "react";
 
 export default function AssetDetail() {
   const params = useParams<{ assetId: string }>();
   const [, setLocation] = useLocation();
   const assetId = parseInt(params?.assetId || "0");
+  const [filters, setFilters] = useState<TimelineFilterState>({});
 
   const { data: asset, isLoading: assetLoading } = trpc.asset.get.useQuery({
     id: assetId,
   });
 
-  const { data: records = [] } = trpc.timeline.list.useQuery({
-    assetId,
-    limit: 50,
-  });
+  // Determine which query to use based on filters
+  const { data: allRecords = [] } = trpc.timeline.list.useQuery(
+    { assetId, limit: 100 },
+    { enabled: !filters.category && !filters.startDate && !filters.endDate }
+  );
+
+  const { data: categoryRecords = [] } = trpc.timeline.listByCategory.useQuery(
+    {
+      assetId,
+      category: filters.category!,
+      limit: 100,
+    },
+    { enabled: !!filters.category && !filters.startDate && !filters.endDate }
+  );
+
+  const { data: dateRangeRecords = [] } = trpc.timeline.listByDateRange.useQuery(
+    {
+      assetId,
+      startDate: filters.startDate || new Date(0),
+      endDate: filters.endDate || new Date(),
+      limit: 100,
+    },
+    { enabled: !!(filters.startDate || filters.endDate) }
+  );
+
+  // Get stats for the asset
+  const { data: stats } = trpc.timeline.getStats.useQuery({ assetId });
+
+  // Select appropriate records based on active filters
+  let records = allRecords;
+  if (filters.category) {
+    records = categoryRecords;
+  } else if (filters.startDate || filters.endDate) {
+    records = dateRangeRecords;
+  }
 
   if (assetLoading) {
     return (
@@ -85,23 +119,54 @@ export default function AssetDetail() {
               <p className="text-slate-900">{asset.description}</p>
             </div>
           )}
+
+          {/* Stats */}
+          {stats && (
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 pt-4 border-t">
+              <div>
+                <p className="text-xs text-slate-600 font-medium">Total</p>
+                <p className="text-2xl font-bold text-slate-900">{stats.totalRecords}</p>
+              </div>
+              <div>
+                <p className="text-xs text-slate-600 font-medium">Problemas</p>
+                <p className="text-2xl font-bold text-red-600">{stats.problemCount}</p>
+              </div>
+              <div>
+                <p className="text-xs text-slate-600 font-medium">Manutenção</p>
+                <p className="text-2xl font-bold text-blue-600">{stats.maintenanceCount}</p>
+              </div>
+              <div>
+                <p className="text-xs text-slate-600 font-medium">Inspeções</p>
+                <p className="text-2xl font-bold text-purple-600">{stats.inspectionCount}</p>
+              </div>
+            </div>
+          )}
         </CardContent>
       </Card>
 
-      {/* Timeline */}
+      {/* Timeline with Filters */}
       <Card>
         <CardHeader>
           <CardTitle>Linha do Tempo</CardTitle>
           <CardDescription>
-            {records.length} registros encontrados
+            {records.length} de {stats?.totalRecords || 0} registros
           </CardDescription>
         </CardHeader>
-        <CardContent>
+        <CardContent className="space-y-6">
+          <TimelineFilters
+            onFilterChange={setFilters}
+            onClearFilters={() => setFilters({})}
+          />
+
           {records.length > 0 ? (
             <TimelineView records={records} />
           ) : (
             <div className="text-center py-8">
-              <p className="text-slate-600">Nenhum registro encontrado</p>
+              <p className="text-slate-600">
+                {Object.keys(filters).length > 0
+                  ? "Nenhum registro encontrado com os filtros aplicados"
+                  : "Nenhum registro encontrado"}
+              </p>
               <Button
                 onClick={() => setLocation(`/asset/${assetId}/quick-record`)}
                 className="mt-4 gap-2"

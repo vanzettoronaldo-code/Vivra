@@ -199,6 +199,71 @@ export const appRouter = router({
       }),
 
     /**
+     * Get timeline records filtered by category
+     */
+    listByCategory: protectedProcedure
+      .input(z.object({
+        assetId: z.number(),
+        category: z.enum(["problem", "maintenance", "decision", "inspection"]),
+        limit: z.number().optional(),
+        offset: z.number().optional(),
+      }))
+      .query(async ({ ctx, input }) => {
+        if (!ctx.user.id || !ctx.user.companyId) {
+          throw new TRPCError({ code: "UNAUTHORIZED" });
+        }
+
+        return await getTimelineRecordsByCategory(
+          input.assetId,
+          ctx.user.companyId,
+          input.category,
+          input.limit,
+          input.offset
+        );
+      }),
+
+    /**
+     * Get timeline records filtered by date range
+     */
+    listByDateRange: protectedProcedure
+      .input(z.object({
+        assetId: z.number(),
+        startDate: z.date(),
+        endDate: z.date(),
+        limit: z.number().optional(),
+        offset: z.number().optional(),
+      }))
+      .query(async ({ ctx, input }) => {
+        if (!ctx.user.id || !ctx.user.companyId) {
+          throw new TRPCError({ code: "UNAUTHORIZED" });
+        }
+
+        return await getTimelineRecordsByDateRange(
+          input.assetId,
+          ctx.user.companyId,
+          input.startDate,
+          input.endDate,
+          input.limit,
+          input.offset
+        );
+      }),
+
+    /**
+     * Get timeline statistics for an asset
+     */
+    getStats: protectedProcedure
+      .input(z.object({
+        assetId: z.number(),
+      }))
+      .query(async ({ ctx, input }) => {
+        if (!ctx.user.id || !ctx.user.companyId) {
+          throw new TRPCError({ code: "UNAUTHORIZED" });
+        }
+
+        return await getTimelineRecordStats(input.assetId, ctx.user.companyId);
+      }),
+
+    /**
      * Create timeline record
      */
     create: protectedProcedure
