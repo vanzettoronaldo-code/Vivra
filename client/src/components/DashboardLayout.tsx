@@ -22,6 +22,7 @@ import {
 import { getLoginUrl } from "@/const";
 import { useIsMobile } from "@/hooks/useMobile";
 import { LayoutDashboard, LogOut, PanelLeft, Users, Globe } from "lucide-react";
+import { NotificationBell } from "./NotificationCenter";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { CSSProperties, useEffect, useRef, useState } from "react";
 import { useLocation } from "wouter";
@@ -257,9 +258,13 @@ function DashboardLayoutContent({
                 </div>
               </div>
             </div>
+            <NotificationBell />
           </div>
         )}
-        <main className="flex-1 p-4">{children}        </main>
+        <div className="flex border-b h-14 items-center justify-end bg-background/95 px-4 backdrop-blur supports-[backdrop-filter]:backdrop-blur sticky top-0 z-40 hidden md:flex">
+          <NotificationBell />
+        </div>
+        <main className="flex-1 p-4">{children}</main>
       </SidebarInset>
     </>
   );

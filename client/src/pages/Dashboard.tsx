@@ -2,11 +2,13 @@ import { trpc } from "@/lib/trpc";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useLocation } from "wouter";
+import { useNotificationSimulator } from "@/hooks/useNotificationSimulator";
 import { Plus, AlertCircle, Building2 } from "lucide-react";
 import { useState } from "react";
 import CreateAssetDialog from "@/components/CreateAssetDialog";
 
 export default function Dashboard() {
+  useNotificationSimulator();
   const [, setLocation] = useLocation();
   const [showCreateDialog, setShowCreateDialog] = useState(false);
 

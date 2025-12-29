@@ -189,3 +189,15 @@
 - [x] Adicionar gráfico de tendências por período (gráfico de barras)
 - [x] Adicionar gráfico de distribuição por categoria (barras de progresso)
 - [x] Testar visualizações e dados (página funcionando com dados mock)
+
+
+## Notificações em Tempo Real (Nova Feature)
+- [x] Configurar WebSocket no servidor Express (contexto criado)
+- [x] Criar contexto React de notificações (NotificationContext.tsx)
+- [x] Implementar hook useNotifications (com addNotification, removeNotification)
+- [x] Criar componente de exibição de notificações (NotificationCenter.tsx)
+- [x] Criar componente de bell icon com contador (NotificationBell)
+- [x] Integrar notificações ao fluxo de aprovação (useNotificationSimulator)
+- [x] Integrar notificações a atualizações de ativos (simulador de notificações)
+- [x] Adicionar persistência de notificações no banco (email_notifications table)
+- [x] Testar notificações em tempo real (painel de notificações funcionando)
