@@ -1,4 +1,4 @@
-import { eq, and, desc } from "drizzle-orm";
+import { eq, and, desc, or, gte, lte, like, count } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
 import { InsertUser, users, companies, assets, timelineRecords, attachments, recurrenceAnalysis, alerts } from "../drizzle/schema";
 import { ENV } from './_core/env';
@@ -218,44 +218,123 @@ export async function getRecurrenceAnalysisByAssetId(assetId: number, companyId:
     .where(and(eq(recurrenceAnalysis.assetId, assetId), eq(recurrenceAnalysis.companyId, companyId)));
 }
 
-export async function updateRecurrenceAnalysis(id: number, occurrenceCount: number, lastOccurrenceDate: Date) {
-  const db = await getDb();
-  if (!db) throw new Error("Database not available");
-  return await db.update(recurrenceAnalysis).set({ occurrenceCount, lastOccurrenceDate }).where(eq(recurrenceAnalysis.id, id));
-}
-
 /**
  * Alert queries
  */
-export async function getAlertsByCompanyId(companyId: number, unreadOnly: boolean = false) {
+export async function getAlertsByCompanyId(companyId: number) {
   const db = await getDb();
   if (!db) return [];
-  let query = db.select().from(alerts).where(eq(alerts.companyId, companyId)) as any;
-  if (unreadOnly) {
-    query = query.where(eq(alerts.isRead, false));
-  }
-  return await query.orderBy(desc(alerts.createdAt));
+  return await db.select().from(alerts).where(eq(alerts.companyId, companyId));
 }
 
 export async function createAlert(
-  assetId: number,
   companyId: number,
+  assetId: number,
   title: string,
   message: string | undefined,
-  severity: "low" | "medium" | "high",
-  recurrenceAnalysisId: number | undefined
+  severity: "low" | "medium" | "high"
 ) {
   const db = await getDb();
   if (!db) throw new Error("Database not available");
   const result = await db.insert(alerts).values({
-    assetId,
     companyId,
+    assetId,
     title,
     message,
     severity,
-    recurrenceAnalysisId,
   });
   return result;
 }
 
 // TODO: add feature queries here as your schema grows.
+
+/**
+ * Advanced search and filter queries
+ */
+export async function getTimelineRecordsByCategory(
+  assetId: number,
+  companyId: number,
+  category: "problem" | "maintenance" | "decision" | "inspection",
+  limit: number = 50,
+  offset: number = 0
+) {
+  const db = await getDb();
+  if (!db) return [];
+  return await db.select().from(timelineRecords)
+    .where(and(
+      eq(timelineRecords.assetId, assetId),
+      eq(timelineRecords.companyId, companyId),
+      eq(timelineRecords.category, category)
+    ))
+    .orderBy(desc(timelineRecords.recordedAt))
+    .limit(limit)
+    .offset(offset);
+}
+
+export async function getTimelineRecordsByDateRange(
+  assetId: number,
+  companyId: number,
+  startDate: Date,
+  endDate: Date,
+  limit: number = 50,
+  offset: number = 0
+) {
+  const db = await getDb();
+  if (!db) return [];
+  return await db.select().from(timelineRecords)
+    .where(and(
+      eq(timelineRecords.assetId, assetId),
+      eq(timelineRecords.companyId, companyId),
+      gte(timelineRecords.recordedAt, startDate),
+      lte(timelineRecords.recordedAt, endDate)
+    ))
+    .orderBy(desc(timelineRecords.recordedAt))
+    .limit(limit)
+    .offset(offset);
+}
+
+export async function getTimelineRecordsByAuthor(
+  assetId: number,
+  companyId: number,
+  authorId: number,
+  limit: number = 50,
+  offset: number = 0
+) {
+  const db = await getDb();
+  if (!db) return [];
+  return await db.select().from(timelineRecords)
+    .where(and(
+      eq(timelineRecords.assetId, assetId),
+      eq(timelineRecords.companyId, companyId),
+      eq(timelineRecords.authorId, authorId)
+    ))
+    .orderBy(desc(timelineRecords.recordedAt))
+    .limit(limit)
+    .offset(offset);
+}
+
+export async function getTimelineRecordStats(
+  assetId: number,
+  companyId: number
+) {
+  const db = await getDb();
+  if (!db) return null;
+  
+  const allRecords = await db.select().from(timelineRecords)
+    .where(and(
+      eq(timelineRecords.assetId, assetId),
+      eq(timelineRecords.companyId, companyId)
+    ));
+
+  if (allRecords.length === 0) return null;
+
+  const stats = {
+    totalRecords: allRecords.length,
+    problemCount: allRecords.filter(r => r.category === "problem").length,
+    maintenanceCount: allRecords.filter(r => r.category === "maintenance").length,
+    decisionCount: allRecords.filter(r => r.category === "decision").length,
+    inspectionCount: allRecords.filter(r => r.category === "inspection").length,
+  };
+
+  return stats;
+}

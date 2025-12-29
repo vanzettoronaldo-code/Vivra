@@ -87,3 +87,20 @@
 - [ ] Documentar fluxos de usuário
 - [ ] Criar guia de uso
 - [ ] Preparar checkpoint final
+
+
+## Busca e Filtros Avançados (Nova Feature)
+- [x] Criar procedures tRPC para busca e filtros
+- [ ] Implementar busca por texto em títulos, descrições e transcrições
+- [x] Adicionar filtros por categoria, período, autor
+- [ ] Criar componente de filtros avançados
+- [ ] Implementar paginação com filtros
+- [ ] Criar testes para procedures de busca
+- [ ] Refinamento de UX dos filtros
+
+## Correções e Melhorias Implementadas
+- [x] Corrigir erro 404 na rota raiz (/)
+- [x] Implementar auto-criação de empresa para novos usuários
+- [x] Adicionar procedures de filtros avançados (categoria, data, autor)
+- [x] Adicionar funções de estatística de linha do tempo
+- [x] Dashboard corrigido e funcionando

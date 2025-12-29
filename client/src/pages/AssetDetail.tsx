@@ -10,17 +10,13 @@ export default function AssetDetail() {
   const [, setLocation] = useLocation();
   const assetId = parseInt(params?.assetId || "0");
 
-  const { data: asset, isLoading: assetLoading } = trpc.asset.getById.useQuery({
-    assetId,
+  const { data: asset, isLoading: assetLoading } = trpc.asset.get.useQuery({
+    id: assetId,
   });
 
-  const { data: records } = trpc.timeline.getByAsset.useQuery({
+  const { data: records = [] } = trpc.timeline.list.useQuery({
     assetId,
     limit: 50,
-  });
-
-  const { data: recurrence } = trpc.recurrence.getByAsset.useQuery({
-    assetId,
   });
 
   if (assetLoading) {
@@ -52,11 +48,14 @@ export default function AssetDetail() {
         >
           <ArrowLeft className="w-4 h-4" />
         </Button>
-        <div className="flex-1">
+        <div>
           <h1 className="text-3xl font-bold text-slate-900">{asset.name}</h1>
-          <p className="text-slate-600">{asset.type}</p>
+          <p className="text-slate-600 mt-1">{asset.type}</p>
         </div>
-        <Button onClick={() => setLocation(`/asset/${asset.id}/quick-record`)} className="gap-2">
+        <Button
+          onClick={() => setLocation(`/asset/${assetId}/quick-record`)}
+          className="ml-auto gap-2 bg-blue-600 hover:bg-blue-700"
+        >
           <Plus className="w-4 h-4" />
           Novo Registro
         </Button>
@@ -70,68 +69,44 @@ export default function AssetDetail() {
         <CardContent className="space-y-4">
           <div className="grid md:grid-cols-2 gap-4">
             <div>
-              <p className="text-sm text-slate-600">Tipo</p>
-              <p className="font-medium">{asset.type}</p>
+              <p className="text-sm font-medium text-slate-600">Tipo</p>
+              <p className="text-lg text-slate-900">{asset.type}</p>
             </div>
             {asset.location && (
               <div>
-                <p className="text-sm text-slate-600">Localização</p>
-                <p className="font-medium">{asset.location}</p>
+                <p className="text-sm font-medium text-slate-600">Localização</p>
+                <p className="text-lg text-slate-900">{asset.location}</p>
               </div>
             )}
           </div>
           {asset.description && (
             <div>
-              <p className="text-sm text-slate-600">Descrição</p>
-              <p className="font-medium">{asset.description}</p>
+              <p className="text-sm font-medium text-slate-600">Descrição</p>
+              <p className="text-slate-900">{asset.description}</p>
             </div>
           )}
         </CardContent>
       </Card>
-
-      {/* Recurrence Analysis */}
-      {recurrence && recurrence.length > 0 && (
-        <Card className="border-blue-200 bg-blue-50">
-          <CardHeader>
-            <CardTitle className="text-blue-900">Problemas Recorrentes</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-3">
-              {recurrence.map((item) => (
-                <div key={item.id} className="flex justify-between items-start">
-                  <div>
-                    <p className="font-medium text-blue-900">{item.problemKeyword}</p>
-                    <p className="text-sm text-blue-700">
-                      {item.occurrenceCount} ocorrências
-                    </p>
-                  </div>
-                  {item.frequency && (
-                    <span className="text-sm bg-blue-200 text-blue-900 px-2 py-1 rounded">
-                      {item.frequency}
-                    </span>
-                  )}
-                </div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
-      )}
 
       {/* Timeline */}
       <Card>
         <CardHeader>
           <CardTitle>Linha do Tempo</CardTitle>
           <CardDescription>
-            Histórico técnico do ativo
+            {records.length} registros encontrados
           </CardDescription>
         </CardHeader>
         <CardContent>
-          {records && records.length > 0 ? (
+          {records.length > 0 ? (
             <TimelineView records={records} />
           ) : (
-            <div className="text-center py-12">
-              <p className="text-slate-600 mb-4">Nenhum registro ainda</p>
-              <Button onClick={() => setLocation(`/asset/${asset.id}/quick-record`)}>
+            <div className="text-center py-8">
+              <p className="text-slate-600">Nenhum registro encontrado</p>
+              <Button
+                onClick={() => setLocation(`/asset/${assetId}/quick-record`)}
+                className="mt-4 gap-2"
+              >
+                <Plus className="w-4 h-4" />
                 Criar Primeiro Registro
               </Button>
             </div>

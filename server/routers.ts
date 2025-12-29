@@ -18,6 +18,10 @@ import {
   getAlertsByCompanyId,
   createAlert,
   upsertUser,
+  getTimelineRecordsByCategory,
+  getTimelineRecordsByDateRange,
+  getTimelineRecordsByAuthor,
+  getTimelineRecordStats,
 } from "./db";
 import { TRPCError } from "@trpc/server";
 
@@ -51,8 +55,9 @@ export const appRouter = router({
 
         let company = await getCompanyByUserId(ctx.user.id);
 
-        if (!company && input.name) {
-          await createCompany(input.name, input.description, ctx.user.id);
+        if (!company) {
+          const companyName = input.name || `${ctx.user.name || 'User'}'s Assets`;
+          await createCompany(companyName, input.description, ctx.user.id);
           company = await getCompanyByUserId(ctx.user.id);
         }
 
@@ -93,26 +98,50 @@ export const appRouter = router({
      * List all assets for current company
      */
     list: protectedProcedure.query(async ({ ctx }) => {
-      if (!ctx.user.id || !ctx.user.companyId) {
+      if (!ctx.user.id) {
         throw new TRPCError({ code: "UNAUTHORIZED" });
       }
 
-      return await getAssetsByCompanyId(ctx.user.companyId);
+      // Auto-create company if user doesn't have one
+      let companyId = ctx.user.companyId;
+      if (!companyId) {
+        const company = await getCompanyByUserId(ctx.user.id);
+        if (!company) {
+          const companyName = `${ctx.user.name || 'User'}'s Assets`;
+          await createCompany(companyName, undefined, ctx.user.id);
+          const newCompany = await getCompanyByUserId(ctx.user.id);
+          if (!newCompany) {
+            throw new TRPCError({ code: "INTERNAL_SERVER_ERROR" });
+          }
+          companyId = newCompany.id;
+        } else {
+          companyId = company.id;
+        }
+
+        // Update user with companyId
+        await upsertUser({
+          openId: ctx.user.openId,
+          companyId,
+          userRole: "admin",
+        });
+      }
+
+      return await getAssetsByCompanyId(companyId);
     }),
 
     /**
-     * Get single asset by ID
+     * Get single asset
      */
-    getById: protectedProcedure
-      .input(z.object({ assetId: z.number() }))
+    get: protectedProcedure
+      .input(z.object({ id: z.number() }))
       .query(async ({ ctx, input }) => {
         if (!ctx.user.id || !ctx.user.companyId) {
           throw new TRPCError({ code: "UNAUTHORIZED" });
         }
 
-        const asset = await getAssetById(input.assetId, ctx.user.companyId);
+        const asset = await getAssetById(input.id, ctx.user.companyId);
         if (!asset) {
-          throw new TRPCError({ code: "NOT_FOUND", message: "Asset not found" });
+          throw new TRPCError({ code: "NOT_FOUND" });
         }
 
         return asset;
@@ -123,8 +152,8 @@ export const appRouter = router({
      */
     create: protectedProcedure
       .input(z.object({
-        name: z.string().min(1),
-        type: z.string().min(1),
+        name: z.string(),
+        type: z.string(),
         location: z.string().optional(),
         description: z.string().optional(),
       }))
@@ -133,55 +162,45 @@ export const appRouter = router({
           throw new TRPCError({ code: "UNAUTHORIZED" });
         }
 
-        // Only admin can create assets
+        // Check if user is admin
         if (ctx.user.userRole !== "admin") {
-          throw new TRPCError({ code: "FORBIDDEN", message: "Only admins can create assets" });
+          throw new TRPCError({ code: "FORBIDDEN" });
         }
 
-        const result = await createAsset(
+        return await createAsset(
           ctx.user.companyId,
           input.name,
           input.type,
           input.location,
           input.description
         );
-
-        return result;
       }),
   }),
 
   /**
-   * Timeline record procedures
+   * Timeline procedures
    */
   timeline: router({
     /**
      * Get timeline records for an asset
      */
-    getByAsset: protectedProcedure
+    list: protectedProcedure
       .input(z.object({
         assetId: z.number(),
-        limit: z.number().default(50),
-        offset: z.number().default(0),
+        limit: z.number().optional(),
+        offset: z.number().optional(),
       }))
       .query(async ({ ctx, input }) => {
         if (!ctx.user.id || !ctx.user.companyId) {
           throw new TRPCError({ code: "UNAUTHORIZED" });
         }
 
-        // Verify asset belongs to user's company
-        const asset = await getAssetById(input.assetId, ctx.user.companyId);
-        if (!asset) {
-          throw new TRPCError({ code: "NOT_FOUND", message: "Asset not found" });
-        }
-
-        const records = await getTimelineRecordsByAssetId(
+        return await getTimelineRecordsByAssetId(
           input.assetId,
           ctx.user.companyId,
           input.limit,
           input.offset
         );
-
-        return records;
       }),
 
     /**
@@ -190,7 +209,7 @@ export const appRouter = router({
     create: protectedProcedure
       .input(z.object({
         assetId: z.number(),
-        title: z.string().min(1),
+        title: z.string(),
         description: z.string().optional(),
         category: z.enum(["problem", "maintenance", "decision", "inspection"]),
       }))
@@ -199,18 +218,12 @@ export const appRouter = router({
           throw new TRPCError({ code: "UNAUTHORIZED" });
         }
 
-        // Only admin and collaborator can create records
-        if (ctx.user.userRole === "viewer") {
-          throw new TRPCError({ code: "FORBIDDEN", message: "Viewers cannot create records" });
+        // Check if user can create records
+        if (!["admin", "collaborator"].includes(ctx.user.userRole || "")) {
+          throw new TRPCError({ code: "FORBIDDEN" });
         }
 
-        // Verify asset belongs to user's company
-        const asset = await getAssetById(input.assetId, ctx.user.companyId);
-        if (!asset) {
-          throw new TRPCError({ code: "NOT_FOUND", message: "Asset not found" });
-        }
-
-        const result = await createTimelineRecord(
+        return await createTimelineRecord(
           input.assetId,
           ctx.user.companyId,
           input.title,
@@ -219,58 +232,6 @@ export const appRouter = router({
           ctx.user.id,
           new Date()
         );
-
-        return result;
-      }),
-  }),
-
-  /**
-   * Attachment procedures
-   */
-  attachment: router({
-    /**
-     * Get attachments for a record
-     */
-    getByRecord: protectedProcedure
-      .input(z.object({ recordId: z.number() }))
-      .query(async ({ ctx, input }) => {
-        if (!ctx.user.id || !ctx.user.companyId) {
-          throw new TRPCError({ code: "UNAUTHORIZED" });
-        }
-
-        return await getAttachmentsByRecordId(input.recordId);
-      }),
-
-    /**
-     * Create attachment (called after file upload to S3)
-     */
-    create: protectedProcedure
-      .input(z.object({
-        recordId: z.number(),
-        fileKey: z.string(),
-        url: z.string(),
-        mimeType: z.string(),
-        fileName: z.string().optional(),
-        fileSize: z.number().optional(),
-        attachmentType: z.enum(["photo", "audio"]),
-      }))
-      .mutation(async ({ ctx, input }) => {
-        if (!ctx.user.id || !ctx.user.companyId) {
-          throw new TRPCError({ code: "UNAUTHORIZED" });
-        }
-
-        const result = await createAttachment(
-          input.recordId,
-          ctx.user.companyId,
-          input.fileKey,
-          input.url,
-          input.mimeType,
-          input.fileName,
-          input.fileSize,
-          input.attachmentType
-        );
-
-        return result;
       }),
   }),
 
@@ -279,40 +240,18 @@ export const appRouter = router({
    */
   alert: router({
     /**
-     * Get alerts for current company
+     * List alerts for current company
      */
     list: protectedProcedure
-      .input(z.object({ unreadOnly: z.boolean().default(false) }))
+      .input(z.object({
+        unreadOnly: z.boolean().optional(),
+      }))
       .query(async ({ ctx, input }) => {
         if (!ctx.user.id || !ctx.user.companyId) {
           throw new TRPCError({ code: "UNAUTHORIZED" });
         }
 
-        return await getAlertsByCompanyId(ctx.user.companyId, input.unreadOnly);
-      }),
-  }),
-
-  /**
-   * Recurrence analysis procedures
-   */
-  recurrence: router({
-    /**
-     * Get recurrence analysis for an asset
-     */
-    getByAsset: protectedProcedure
-      .input(z.object({ assetId: z.number() }))
-      .query(async ({ ctx, input }) => {
-        if (!ctx.user.id || !ctx.user.companyId) {
-          throw new TRPCError({ code: "UNAUTHORIZED" });
-        }
-
-        // Verify asset belongs to user's company
-        const asset = await getAssetById(input.assetId, ctx.user.companyId);
-        if (!asset) {
-          throw new TRPCError({ code: "NOT_FOUND", message: "Asset not found" });
-        }
-
-        return await getRecurrenceAnalysisByAssetId(input.assetId, ctx.user.companyId);
+        return await getAlertsByCompanyId(ctx.user.companyId);
       }),
   }),
 });

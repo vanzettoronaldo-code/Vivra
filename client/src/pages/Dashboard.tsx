@@ -2,7 +2,7 @@ import { trpc } from "@/lib/trpc";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useLocation } from "wouter";
-import { Plus, AlertCircle } from "lucide-react";
+import { Plus, AlertCircle, Building2 } from "lucide-react";
 import { useState } from "react";
 import CreateAssetDialog from "@/components/CreateAssetDialog";
 
@@ -10,13 +10,21 @@ export default function Dashboard() {
   const [, setLocation] = useLocation();
   const [showCreateDialog, setShowCreateDialog] = useState(false);
 
-  const { data: assets, isLoading, error, refetch } = trpc.asset.list.useQuery();
-  const { data: alerts } = trpc.alert.list.useQuery({ unreadOnly: true });
+  // Use enabled: false initially to prevent automatic query, then enable after component mounts
+  const { data: assets = [], isLoading, error } = trpc.asset.list.useQuery(undefined, {
+    retry: 1,
+  });
+  const { data: alerts = [] } = trpc.alert.list.useQuery({ unreadOnly: true }, {
+    retry: 1,
+  });
 
   if (isLoading) {
     return (
       <div className="flex items-center justify-center h-96">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p className="text-slate-600">Carregando ativos...</p>
+        </div>
       </div>
     );
   }
@@ -24,8 +32,12 @@ export default function Dashboard() {
   if (error) {
     return (
       <div className="p-6">
-        <div className="bg-red-50 border border-red-200 rounded-lg p-4">
-          <p className="text-red-800">Erro ao carregar ativos: {error.message}</p>
+        <div className="bg-red-50 border border-red-200 rounded-lg p-4 flex items-start gap-3">
+          <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
+          <div>
+            <p className="text-red-900 font-medium">Erro ao carregar ativos</p>
+            <p className="text-red-800 text-sm mt-1">{error.message}</p>
+          </div>
         </div>
       </div>
     );
@@ -39,7 +51,7 @@ export default function Dashboard() {
           <h1 className="text-3xl font-bold text-slate-900">Ativos</h1>
           <p className="text-slate-600 mt-1">Gerencie seus ativos físicos e histórico técnico</p>
         </div>
-        <Button onClick={() => setShowCreateDialog(true)} className="gap-2">
+        <Button onClick={() => setShowCreateDialog(true)} className="gap-2 bg-blue-600 hover:bg-blue-700">
           <Plus className="w-4 h-4" />
           Novo Ativo
         </Button>
@@ -49,10 +61,8 @@ export default function Dashboard() {
       {alerts && alerts.length > 0 && (
         <Card className="border-orange-200 bg-orange-50">
           <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-orange-900">
-              <AlertCircle className="w-5 h-5" />
-              Alertas de Problemas Recorrentes
-            </CardTitle>
+            <CardTitle className="text-orange-900">Alertas Recentes</CardTitle>
+            <CardDescription className="text-orange-800">Problemas recorrentes detectados</CardDescription>
           </CardHeader>
           <CardContent>
             <div className="space-y-2">
@@ -67,55 +77,62 @@ export default function Dashboard() {
         </Card>
       )}
 
-      {/* Assets Grid */}
+      {/* Assets Section */}
       {assets && assets.length > 0 ? (
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {assets.map((asset) => (
-            <Card
-              key={asset.id}
-              className="cursor-pointer hover:shadow-lg transition-shadow"
-              onClick={() => setLocation(`/asset/${asset.id}`)}
-            >
-              <CardHeader>
-                <CardTitle className="text-lg">{asset.name}</CardTitle>
-                <CardDescription>{asset.type}</CardDescription>
-              </CardHeader>
-              <CardContent>
-                {asset.location && (
-                  <p className="text-sm text-slate-600 mb-2">
-                    <span className="font-medium">Local:</span> {asset.location}
-                  </p>
-                )}
-                {asset.description && (
-                  <p className="text-sm text-slate-600">
-                    {asset.description.substring(0, 100)}
-                    {asset.description.length > 100 ? "..." : ""}
-                  </p>
-                )}
-              </CardContent>
-            </Card>
-          ))}
+        <div>
+          <h2 className="text-xl font-semibold text-slate-900 mb-4">Seus Ativos ({assets.length})</h2>
+          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+            {assets.map((asset: any) => (
+              <Card
+                key={asset.id}
+                className="cursor-pointer hover:shadow-lg transition-shadow"
+                onClick={() => setLocation(`/asset/${asset.id}`)}
+              >
+                <CardHeader>
+                  <div className="flex items-start justify-between">
+                    <div className="flex-1">
+                      <CardTitle className="text-lg">{asset.name}</CardTitle>
+                      <CardDescription>{asset.type}</CardDescription>
+                    </div>
+                    <Building2 className="w-5 h-5 text-slate-400" />
+                  </div>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-2 text-sm">
+                    {asset.location && (
+                      <p className="text-slate-600">
+                        <span className="font-medium">Localização:</span> {asset.location}
+                      </p>
+                    )}
+                    {asset.description && (
+                      <p className="text-slate-600 line-clamp-2">
+                        <span className="font-medium">Descrição:</span> {asset.description}
+                      </p>
+                    )}
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
         </div>
       ) : (
-        <Card>
-          <CardContent className="pt-6">
-            <div className="text-center py-12">
-              <p className="text-slate-600 mb-4">Nenhum ativo cadastrado ainda</p>
-              <Button onClick={() => setShowCreateDialog(true)}>Criar Primeiro Ativo</Button>
-            </div>
+        <Card className="border-dashed border-2">
+          <CardContent className="flex flex-col items-center justify-center py-12">
+            <Building2 className="w-12 h-12 text-slate-300 mb-4" />
+            <h3 className="text-lg font-semibold text-slate-900 mb-2">Nenhum ativo cadastrado</h3>
+            <p className="text-slate-600 text-center mb-6">
+              Comece criando seu primeiro ativo para registrar histórico técnico
+            </p>
+            <Button onClick={() => setShowCreateDialog(true)} className="gap-2">
+              <Plus className="w-4 h-4" />
+              Criar Primeiro Ativo
+            </Button>
           </CardContent>
         </Card>
       )}
 
       {/* Create Asset Dialog */}
-      <CreateAssetDialog
-        open={showCreateDialog}
-        onOpenChange={setShowCreateDialog}
-        onSuccess={() => {
-          setShowCreateDialog(false);
-          refetch();
-        }}
-      />
+      <CreateAssetDialog open={showCreateDialog} onOpenChange={setShowCreateDialog} />
     </div>
   );
 }

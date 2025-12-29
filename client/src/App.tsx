@@ -35,6 +35,7 @@ function Router() {
   return (
     <DashboardLayout>
       <Switch>
+        <Route path={"/"} component={Dashboard} />
         <Route path={"/dashboard"} component={Dashboard} />
         <Route path={"/asset/:assetId"} component={AssetDetail} />
         <Route path={"/asset/:assetId/quick-record"} component={QuickRecord} />
