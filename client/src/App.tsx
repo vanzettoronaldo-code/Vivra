@@ -25,6 +25,8 @@ import Integrations from "./pages/Integrations";
 import Alerts from "./pages/Alerts";
 import DashboardOverview from "./pages/DashboardOverview";
 import ServiceProviders from "./pages/ServiceProviders";
+import ServiceProviderDetail from "./pages/ServiceProviderDetail";
+import ServiceCalendar from "./pages/ServiceCalendar";
 
 function Router() {
   const { isAuthenticated, loading } = useAuth();
@@ -74,6 +76,10 @@ function Router() {
         <Route path={"/overview"} component={DashboardOverview} />
         <Route path={"/prestadores"} component={ServiceProviders} />
         <Route path={"/service-providers"} component={ServiceProviders} />
+        <Route path={"/prestadores/:id"} component={ServiceProviderDetail} />
+        <Route path={"/providers/:id"} component={ServiceProviderDetail} />
+        <Route path={"/calendario"} component={ServiceCalendar} />
+        <Route path={"/calendar"} component={ServiceCalendar} />
        <Route path={"/404"} component={NotFound} />
         <Route component={NotFound} />
       </Switch>

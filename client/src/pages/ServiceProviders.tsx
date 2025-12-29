@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useLocation } from "wouter";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { trpc } from "@/lib/trpc";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -26,6 +27,7 @@ const providerTypes = [
 export default function ServiceProviders() {
   const { language } = useLanguage();
   const isPt = language === "pt-BR";
+  const [, setLocation] = useLocation();
   
   const [searchTerm, setSearchTerm] = useState("");
   const [filterType, setFilterType] = useState<string>("all");
@@ -450,7 +452,7 @@ export default function ServiceProviders() {
                           </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
-                          <DropdownMenuItem onClick={() => { setSelectedProvider(provider); setIsViewDialogOpen(true); }}>
+                          <DropdownMenuItem onClick={() => setLocation(`/prestadores/${provider.id}`)}>
                             <Eye className="w-4 h-4 mr-2" />
                             {t.view}
                           </DropdownMenuItem>

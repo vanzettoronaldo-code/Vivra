@@ -354,3 +354,60 @@
 - [x] Adicionar dados de exemplo no banco (8 prestadores, 15 serviços)
 - [x] Adicionar rota e link no menu
 - [x] Testar a página
+
+
+## Página de Detalhes do Prestador (Nova Feature)
+- [ ] Criar página ServiceProviderDetail.tsx
+- [ ] Exibir informações completas do prestador
+- [ ] Listar histórico completo de serviços
+- [ ] Adicionar gráfico de desempenho ao longo do tempo
+- [ ] Implementar navegação da lista para detalhes
+- [ ] Adicionar rota /providers/:id
+- [ ] Testar a página
+
+## Sistema de Avaliação de Serviços (Nova Feature)
+- [ ] Estender tabela services com campos de avaliação (rating, comment)
+- [ ] Criar componente StarRating para avaliação
+- [ ] Criar modal de avaliação de serviço
+- [ ] Implementar procedure tRPC para salvar avaliação
+- [ ] Calcular média de avaliação do prestador automaticamente
+- [ ] Exibir avaliações na página de detalhes
+- [ ] Testar o sistema de avaliação
+
+## Calendário de Serviços (Nova Feature)
+- [ ] Criar página ServiceCalendar.tsx
+- [ ] Implementar visualização em calendário mensal
+- [ ] Exibir serviços agendados, em andamento e concluídos
+- [ ] Adicionar cores diferentes por status
+- [ ] Implementar navegação entre meses
+- [ ] Adicionar modal de detalhes ao clicar no serviço
+- [ ] Adicionar rota e link no menu
+- [ ] Testar o calendário
+
+
+## Página de Detalhes do Prestador (Nova Feature)
+- [x] Criar página ServiceProviderDetail.tsx com informações completas
+- [x] Implementar navegação da lista de prestadores para detalhes
+- [x] Exibir histórico completo de serviços do prestador
+- [x] Adicionar gráfico de serviços por mês
+- [x] Exibir distribuição de status (pendente, andamento, aprovado, rejeitado)
+- [x] Mostrar métricas de desempenho (taxa de conclusão, avaliação média, tempo de resposta)
+- [x] Adicionar rotas /prestadores/:id e /providers/:id
+
+## Sistema de Avaliação de Serviços (Nova Feature)
+- [x] Criar componente StarRating.tsx para avaliação com estrelas
+- [x] Criar componente RateServiceDialog.tsx para modal de avaliação
+- [x] Implementar avaliação de 1 a 5 estrelas
+- [x] Adicionar campo de comentário/feedback
+- [x] Integrar avaliação com procedure service.update
+- [x] Exibir avaliações na página de detalhes do prestador
+- [x] Botão de avaliar apenas para serviços aprovados sem avaliação
+
+## Calendário de Serviços (Nova Feature)
+- [x] Criar página ServiceCalendar.tsx com visualização mensal
+- [x] Implementar navegação entre meses
+- [x] Exibir serviços agendados por dia
+- [x] Adicionar legenda de status (cores por status)
+- [x] Criar modal de detalhes do serviço ao clicar
+- [x] Adicionar link no menu lateral (CALENDARIO)
+- [x] Adicionar rotas /calendario e /calendar

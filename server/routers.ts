@@ -446,6 +446,12 @@ export const appRouter = router({
         return getServiceProviderById(input.id);
       }),
     
+    getServices: protectedProcedure
+      .input(z.object({ providerId: z.number() }))
+      .query(async ({ input }) => {
+        return getServicesByProvider(input.providerId);
+      }),
+    
     create: protectedProcedure
       .input(z.object({
         name: z.string().min(1),
