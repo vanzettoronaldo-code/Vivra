@@ -18,6 +18,7 @@ import ApprovalNotifications from "./pages/ApprovalNotifications";
 import AuditLog from "./pages/AuditLog";
 import ApprovalMetrics from "./pages/ApprovalMetrics";
 import Team from "./pages/Team";
+import Intelligence from "./pages/Intelligence";
 
 function Router() {
   const { isAuthenticated, loading } = useAuth();
@@ -52,8 +53,9 @@ function Router() {
         <Route path={"/approval-notifications"} component={ApprovalNotifications} />
         <Route path={"/audit-log"} component={AuditLog} />
         <Route path={"/approval-metrics"} component={ApprovalMetrics} />
-        <Route path={"/team"} component={Team} />
-        <Route path={"/quick-record"} component={QuickRecord} />
+        <Route path={"/team"} component={Team} />        <Route path={"/quick-record"} component={QuickRecord} />
+        <Route path={"/inteligencia"} component={Intelligence} />
+        <Route path={"/intelligence"} component={Intelligence} />
         <Route path={"/404"} component={NotFound} />
         <Route component={NotFound} />      </Switch>
     </DashboardLayout>
