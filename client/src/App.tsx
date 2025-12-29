@@ -20,6 +20,8 @@ import ApprovalMetrics from "./pages/ApprovalMetrics";
 import Team from "./pages/Team";
 import Intelligence from "./pages/Intelligence";
 import Metrics from "./pages/Metrics";
+import ScheduledReports from "./pages/ScheduledReports";
+import Integrations from "./pages/Integrations";
 
 function Router() {
   const { isAuthenticated, loading } = useAuth();
@@ -59,6 +61,10 @@ function Router() {
         <Route path={"/intelligence"} component={Intelligence} />
         <Route path={"/metricas"} component={Metrics} />
         <Route path={"/metrics"} component={Metrics} />
+        <Route path={"/relatorios-agendados"} component={ScheduledReports} />
+        <Route path={"/scheduled-reports"} component={ScheduledReports} />
+        <Route path={"/integracoes"} component={Integrations} />
+        <Route path={"/integrations"} component={Integrations} />
         <Route path={"/404"} component={NotFound} />
         <Route component={NotFound} />      </Switch>
     </DashboardLayout>
