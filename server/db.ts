@@ -48,6 +48,16 @@ export async function upsertUser(user: InsertUser): Promise<void> {
 
     textFields.forEach(assignNullable);
 
+    if (user.companyId !== undefined) {
+      values.companyId = user.companyId;
+      updateSet.companyId = user.companyId;
+    }
+
+    if (user.userRole !== undefined) {
+      values.userRole = user.userRole;
+      updateSet.userRole = user.userRole;
+    }
+
     if (user.lastSignedIn !== undefined) {
       values.lastSignedIn = user.lastSignedIn;
       updateSet.lastSignedIn = user.lastSignedIn;

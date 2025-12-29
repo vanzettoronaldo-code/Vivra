@@ -105,3 +105,4 @@
 - [x] Adicionar funções de estatística de linha do tempo
 - [x] Dashboard corrigido e funcionando
 - [x] Corrigir erro UNAUTHORIZED quando companyId é null
+- [x] Corrigir função upsertUser para suportar companyId e userRole
