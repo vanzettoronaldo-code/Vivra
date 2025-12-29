@@ -21,7 +21,8 @@ import {
 } from "@/components/ui/sidebar";
 import { getLoginUrl } from "@/const";
 import { useIsMobile } from "@/hooks/useMobile";
-import { LayoutDashboard, LogOut, PanelLeft, Users } from "lucide-react";
+import { LayoutDashboard, LogOut, PanelLeft, Users, Globe } from "lucide-react";
+import { useLanguage } from "@/contexts/LanguageContext";
 import { CSSProperties, useEffect, useRef, useState } from "react";
 import { useLocation } from "wouter";
 import { DashboardLayoutSkeleton } from './DashboardLayoutSkeleton';
@@ -221,6 +222,7 @@ function DashboardLayoutContent({
                 </button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-48">
+                <LanguageSelector />
                 <DropdownMenuItem
                   onClick={logout}
                   className="cursor-pointer text-destructive focus:text-destructive"
@@ -257,8 +259,33 @@ function DashboardLayoutContent({
             </div>
           </div>
         )}
-        <main className="flex-1 p-4">{children}</main>
+        <main className="flex-1 p-4">{children}        </main>
       </SidebarInset>
+    </>
+  );
+}
+
+function LanguageSelector() {
+  const { language, setLanguage } = useLanguage();
+
+  return (
+    <>
+      <DropdownMenuItem
+        onClick={() => setLanguage("pt-BR")}
+        className={`cursor-pointer ${language === "pt-BR" ? "bg-accent" : ""}`}
+      >
+        <Globe className="mr-2 h-4 w-4" />
+        <span>Português</span>
+        {language === "pt-BR" && <span className="ml-auto text-xs">✓</span>}
+      </DropdownMenuItem>
+      <DropdownMenuItem
+        onClick={() => setLanguage("en-US")}
+        className={`cursor-pointer ${language === "en-US" ? "bg-accent" : ""}`}
+      >
+        <Globe className="mr-2 h-4 w-4" />
+        <span>English</span>
+        {language === "en-US" && <span className="ml-auto text-xs">✓</span>}
+      </DropdownMenuItem>
     </>
   );
 }

@@ -140,3 +140,12 @@
 - [x] Integrar S3 com página QuickRecord
 - [x] Testar URLs assinadas e validação
 - [x] Implementar tratamento de erros de upload
+
+
+## Suporte a Múltiplos Idiomas (Nova Feature)
+- [x] Criar contexto de idioma e hook useLanguage
+- [x] Criar arquivo de traduções (i18n)
+- [x] Implementar seletor de idioma no menu
+- [x] Traduzir componentes principais (Dashboard, QuickRecord, AssetDetail)
+- [x] Adicionar persistência de idioma (localStorage)
+- [x] Testar e validar traduções (interface em português funcionando)
