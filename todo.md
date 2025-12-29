@@ -230,3 +230,16 @@
 - [ ] Criar painel de inteligência com padrões identificados
 - [ ] Otimizar Registro rápido para celular
 - [ ] Melhorar Linha do tempo da memória técnica
+
+
+## Correções de Menus (Reportado pelo usuário)
+- [x] Diagnosticar problema com dropdown menu do avatar
+- [x] Corrigir abertura/fechamento do menu de configurações
+- [x] Corrigir menu de idioma (LanguageSelector)
+- [x] Melhorar responsividade dos menus em mobile
+- [x] Adicionar feedback visual ao clicar nos menus
+- [x] Testar todos os menus no navegador
+- [x] Reescrever DashboardLayout com menu customizado
+- [x] Implementar seleção de idioma funcional
+- [x] Testar abertura do diálogo de configurações
+- [x] Testar todas as 3 abas (Perfil, Aprovações, Notificações)

@@ -1,12 +1,6 @@
 import { useAuth } from "@/_core/hooks/useAuth";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import {
   Sidebar,
   SidebarContent,
   SidebarFooter,
@@ -21,7 +15,7 @@ import {
 } from "@/components/ui/sidebar";
 import { getLoginUrl } from "@/const";
 import { useIsMobile } from "@/hooks/useMobile";
-import { LayoutDashboard, LogOut, PanelLeft, Users, Globe, BarChart3, Plus, CheckSquare, Lightbulb, Users2 } from "lucide-react";
+import { LayoutDashboard, LogOut, PanelLeft, Users, Globe, BarChart3, Plus, CheckSquare, Lightbulb, Users2, Settings } from "lucide-react";
 import { NotificationBell } from "./NotificationCenter";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { CSSProperties, useEffect, useRef, useState } from "react";
@@ -29,7 +23,6 @@ import { useLocation } from "wouter";
 import { DashboardLayoutSkeleton } from './DashboardLayoutSkeleton';
 import { Button } from "./ui/button";
 import { SettingsDialog } from "./SettingsDialog";
-import { Settings } from "lucide-react";
 
 const menuItems = [
   { icon: BarChart3, label: "DASHBOARDS", path: "/" },
@@ -55,7 +48,6 @@ export default function DashboardLayout({
     return saved ? parseInt(saved, 10) : DEFAULT_WIDTH;
   });
   const { loading, user } = useAuth();
-  const [settingsOpen, setSettingsOpen] = useState(false);
 
   useEffect(() => {
     localStorage.setItem(SIDEBAR_WIDTH_KEY, sidebarWidth.toString());
@@ -124,6 +116,9 @@ function DashboardLayoutContent({
   const activeMenuItem = menuItems.find(item => item.path === location);
   const isMobile = useIsMobile();
   const [settingsOpen, setSettingsOpen] = useState(false);
+  const [userMenuOpen, setUserMenuOpen] = useState(false);
+  const { language, setLanguage } = useLanguage();
+  const menuRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (isCollapsed) {
@@ -160,6 +155,23 @@ function DashboardLayoutContent({
       document.body.style.userSelect = "";
     };
   }, [isResizing, setSidebarWidth]);
+
+  // Close menu when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
+        setUserMenuOpen(false);
+      }
+    };
+
+    if (userMenuOpen) {
+      document.addEventListener("mousedown", handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [userMenuOpen]);
 
   return (
     <>
@@ -212,42 +224,87 @@ function DashboardLayoutContent({
           </SidebarContent>
 
           <SidebarFooter className="p-3">
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <button className="flex items-center gap-3 rounded-lg px-1 py-1 hover:bg-accent/50 transition-colors w-full text-left group-data-[collapsible=icon]:justify-center focus:outline-none focus-visible:ring-2 focus-visible:ring-ring">
-                  <Avatar className="h-9 w-9 border shrink-0">
-                    <AvatarFallback className="text-xs font-medium">
-                      {user?.name?.charAt(0).toUpperCase()}
-                    </AvatarFallback>
-                  </Avatar>
-                  <div className="flex-1 min-w-0 group-data-[collapsible=icon]:hidden">
-                    <p className="text-sm font-medium truncate leading-none">
-                      {user?.name || "-"}
-                    </p>
-                    <p className="text-xs text-muted-foreground truncate mt-1.5">
-                      {user?.email || "-"}
-                    </p>
+            <div className="relative" ref={menuRef}>
+              <button
+                onClick={() => setUserMenuOpen(!userMenuOpen)}
+                className="flex items-center gap-3 rounded-lg px-2 py-2 hover:bg-accent/50 transition-colors w-full text-left group-data-[collapsible=icon]:justify-center focus:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+              >
+                <Avatar className="h-8 w-8 border shrink-0">
+                  <AvatarFallback className="text-xs font-medium bg-primary text-primary-foreground">
+                    {user?.name?.charAt(0).toUpperCase()}
+                  </AvatarFallback>
+                </Avatar>
+                <div className="flex-1 min-w-0 group-data-[collapsible=icon]:hidden">
+                  <p className="text-sm font-medium truncate leading-none">
+                    {user?.name || "-"}
+                  </p>
+                  <p className="text-xs text-muted-foreground truncate mt-1">
+                    {user?.email || "-"}
+                  </p>
+                </div>
+              </button>
+
+              {/* Custom Dropdown Menu */}
+              {userMenuOpen && (
+                <div className="absolute bottom-full left-0 right-0 mb-2 bg-popover border border-border rounded-lg shadow-lg z-50 overflow-hidden">
+                  {/* Settings Option */}
+                  <button
+                    onClick={() => {
+                      setSettingsOpen(true);
+                      setUserMenuOpen(false);
+                    }}
+                    className="w-full flex items-center gap-3 px-4 py-3 hover:bg-accent text-sm transition-colors text-left"
+                  >
+                    <Settings className="h-4 w-4" />
+                    <span>{language === "pt-BR" ? "Configurações" : "Settings"}</span>
+                  </button>
+
+                  {/* Language Options */}
+                  <div className="border-t border-border">
+                    <button
+                      onClick={() => {
+                        setLanguage("pt-BR");
+                        setUserMenuOpen(false);
+                      }}
+                      className={`w-full flex items-center gap-3 px-4 py-3 hover:bg-accent text-sm transition-colors text-left ${
+                        language === "pt-BR" ? "bg-accent" : ""
+                      }`}
+                    >
+                      <Globe className="h-4 w-4" />
+                      <span>Português</span>
+                      {language === "pt-BR" && <span className="ml-auto">✓</span>}
+                    </button>
+                    <button
+                      onClick={() => {
+                        setLanguage("en-US");
+                        setUserMenuOpen(false);
+                      }}
+                      className={`w-full flex items-center gap-3 px-4 py-3 hover:bg-accent text-sm transition-colors text-left ${
+                        language === "en-US" ? "bg-accent" : ""
+                      }`}
+                    >
+                      <Globe className="h-4 w-4" />
+                      <span>English</span>
+                      {language === "en-US" && <span className="ml-auto">✓</span>}
+                    </button>
                   </div>
-                </button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-48">
-                <DropdownMenuItem
-                  onClick={() => setSettingsOpen(true)}
-                  className="cursor-pointer"
-                >
-                  <Settings className="mr-2 h-4 w-4" />
-                  <span>Configuracoes</span>
-                </DropdownMenuItem>
-                <LanguageSelector />
-                <DropdownMenuItem
-                  onClick={logout}
-                  className="cursor-pointer text-destructive focus:text-destructive"
-                >
-                  <LogOut className="mr-2 h-4 w-4" />
-                  <span>Sign out</span>
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
+
+                  {/* Logout Option */}
+                  <div className="border-t border-border">
+                    <button
+                      onClick={() => {
+                        logout();
+                        setUserMenuOpen(false);
+                      }}
+                      className="w-full flex items-center gap-3 px-4 py-3 hover:bg-destructive/10 text-sm transition-colors text-left text-destructive"
+                    >
+                      <LogOut className="h-4 w-4" />
+                      <span>{language === "pt-BR" ? "Sair" : "Sign out"}</span>
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
           </SidebarFooter>
         </Sidebar>
         <SettingsDialog open={settingsOpen} onOpenChange={setSettingsOpen} />
@@ -282,31 +339,6 @@ function DashboardLayoutContent({
         </div>
         <main className="flex-1 p-4">{children}</main>
       </SidebarInset>
-    </>
-  );
-}
-
-function LanguageSelector() {
-  const { language, setLanguage } = useLanguage();
-
-  return (
-    <>
-      <DropdownMenuItem
-        onClick={() => setLanguage("pt-BR")}
-        className={`cursor-pointer ${language === "pt-BR" ? "bg-accent" : ""}`}
-      >
-        <Globe className="mr-2 h-4 w-4" />
-        <span>Português</span>
-        {language === "pt-BR" && <span className="ml-auto text-xs">✓</span>}
-      </DropdownMenuItem>
-      <DropdownMenuItem
-        onClick={() => setLanguage("en-US")}
-        className={`cursor-pointer ${language === "en-US" ? "bg-accent" : ""}`}
-      >
-        <Globe className="mr-2 h-4 w-4" />
-        <span>English</span>
-        {language === "en-US" && <span className="ml-auto text-xs">✓</span>}
-      </DropdownMenuItem>
     </>
   );
 }

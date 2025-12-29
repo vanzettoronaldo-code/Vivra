@@ -102,6 +102,8 @@ export function SettingsDialog({ open, onOpenChange }: SettingsDialogProps) {
       weeklySummary: "Resumo Semanal",
       weeklySummaryDesc: "Receber um resumo semanal por email",
       saveSettings: "Salvar Configurações",
+      loading: "Carregando...",
+      saving: "Salvando...",
     },
     "en-US": {
       settings: "Settings",
@@ -128,6 +130,8 @@ export function SettingsDialog({ open, onOpenChange }: SettingsDialogProps) {
       weeklySummary: "Weekly Summary",
       weeklySummaryDesc: "Receive a weekly summary by email",
       saveSettings: "Save Settings",
+      loading: "Loading...",
+      saving: "Saving...",
     },
   };
 
@@ -211,7 +215,7 @@ export function SettingsDialog({ open, onOpenChange }: SettingsDialogProps) {
           <TabsContent value="approvals" className="space-y-6">
             {isLoading ? (
               <div className="text-center py-4">
-                {language === "pt-BR" ? "Carregando..." : "Loading..."}
+                {t.loading}
               </div>
             ) : (
               <div className="space-y-4">
@@ -306,7 +310,7 @@ export function SettingsDialog({ open, onOpenChange }: SettingsDialogProps) {
                   onClick={handleSaveApprovalSettings}
                   disabled={isSaving}
                 >
-                  {isSaving ? (language === "pt-BR" ? "Salvando..." : "Saving...") : t.saveSettings}
+                  {isSaving ? t.saving : t.saveSettings}
                 </Button>
               </div>
             )}
@@ -316,7 +320,7 @@ export function SettingsDialog({ open, onOpenChange }: SettingsDialogProps) {
           <TabsContent value="notifications" className="space-y-6">
             {isLoading ? (
               <div className="text-center py-4">
-                {language === "pt-BR" ? "Carregando..." : "Loading..."}
+                {t.loading}
               </div>
             ) : (
               <div className="space-y-4">
@@ -390,7 +394,7 @@ export function SettingsDialog({ open, onOpenChange }: SettingsDialogProps) {
                   onClick={handleSaveNotificationSettings}
                   disabled={isSaving}
                 >
-                  {isSaving ? (language === "pt-BR" ? "Salvando..." : "Saving...") : t.saveSettings}
+                  {isSaving ? t.saving : t.saveSettings}
                 </Button>
               </div>
             )}
