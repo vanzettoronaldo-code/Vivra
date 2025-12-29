@@ -332,3 +332,13 @@
 - [x] Implementar envio real de emails para relatorios agendados (emailService.ts)
 - [x] Criar pagina de configuracoes de alertas com thresholds personalizados (Alerts.tsx)
 - [x] Testar todas as funcionalidades
+
+
+## Dashboard Overview (Solicitado pelo usuário)
+- [x] Criar página DashboardOverview.tsx com cards de resumo
+- [x] Adicionar card de total de ativos
+- [x] Adicionar card de registros recentes
+- [x] Adicionar card de alertas ativos
+- [x] Adicionar gráficos de tendências (distribuição por categoria)
+- [x] Adicionar rota e link no menu
+- [x] Testar a página

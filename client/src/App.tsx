@@ -23,6 +23,7 @@ import Metrics from "./pages/Metrics";
 import ScheduledReports from "./pages/ScheduledReports";
 import Integrations from "./pages/Integrations";
 import Alerts from "./pages/Alerts";
+import DashboardOverview from "./pages/DashboardOverview";
 
 function Router() {
   const { isAuthenticated, loading } = useAuth();
@@ -68,6 +69,8 @@ function Router() {
         <Route path={"/integrations"} component={Integrations} />
         <Route path={"/alertas"} component={Alerts} />
         <Route path={"/alerts"} component={Alerts} />
+        <Route path={"/visao-geral"} component={DashboardOverview} />
+        <Route path={"/overview"} component={DashboardOverview} />
        <Route path={"/404"} component={NotFound} />
         <Route component={NotFound} />
       </Switch>

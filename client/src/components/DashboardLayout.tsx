@@ -15,7 +15,7 @@ import {
 } from "@/components/ui/sidebar";
 import { getLoginUrl } from "@/const";
 import { useIsMobile } from "@/hooks/useMobile";
-import { LayoutDashboard, LogOut, PanelLeft, Users, Globe, BarChart3, Plus, CheckSquare, Lightbulb, Users2, Settings, TrendingUp, FileText, Plug, Bell } from "lucide-react";
+import { LayoutDashboard, LogOut, PanelLeft, Users, Globe, BarChart3, Plus, CheckSquare, Lightbulb, Users2, Settings, TrendingUp, FileText, Plug, Bell, Building2, Home } from "lucide-react";
 import { NotificationBell } from "./NotificationCenter";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { CSSProperties, useEffect, useRef, useState } from "react";
@@ -25,7 +25,8 @@ import { Button } from "./ui/button";
 import { SettingsDialog } from "./SettingsDialog";
 
 const menuItems = [
-  { icon: LayoutDashboard, label: "ATIVOS", path: "/" },
+  { icon: Home, label: "VISAO GERAL", path: "/visao-geral" },
+  { icon: Building2, label: "ATIVOS", path: "/" },
   { icon: Plus, label: "+ NOVOS REGISTROS", path: "/quick-record" },
   { icon: CheckSquare, label: "APROVACOES", path: "/approval-notifications" },
   { icon: Lightbulb, label: "INTELIGENCIA", path: "/inteligencia" },
