@@ -9,6 +9,7 @@ import Home from "./pages/Home";
 import { useAuth } from "./_core/hooks/useAuth";
 import DashboardLayout from "./components/DashboardLayout";
 import Dashboard from "./pages/Dashboard";
+import Page2 from "./pages/Page2";
 import AssetDetail from "./pages/AssetDetail";
 import QuickRecord from "./pages/QuickRecord";
 
@@ -38,6 +39,7 @@ function Router() {
       <Switch>
         <Route path={"/"} component={Dashboard} />
         <Route path={"/dashboard"} component={Dashboard} />
+        <Route path={"/some-path"} component={Page2} />
         <Route path={"/asset/:assetId"} component={AssetDetail} />
         <Route path={"/asset/:assetId/quick-record"} component={QuickRecord} />
         <Route path={"/404"} component={NotFound} />
