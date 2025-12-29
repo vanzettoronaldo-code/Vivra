@@ -53,6 +53,7 @@ function Router() {
         <Route path={"/audit-log"} component={AuditLog} />
         <Route path={"/approval-metrics"} component={ApprovalMetrics} />
         <Route path={"/team"} component={Team} />
+        <Route path={"/quick-record"} component={QuickRecord} />
         <Route path={"/404"} component={NotFound} />
         <Route component={NotFound} />      </Switch>
     </DashboardLayout>

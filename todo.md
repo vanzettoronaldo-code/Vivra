@@ -261,3 +261,10 @@
 - [ ] Criar procedures tRPC para gerenciamento de equipe (persistência)
 - [ ] Adicionar funcionalidade de convite de usuários
 - [x] Testar a página /team
+
+
+## Correção da Aba NOVOS REGISTROS (Reportado pelo usuário - erro)
+- [x] Diagnosticar qual rota está associada a NOVOS REGISTROS
+- [x] Verificar se a página existe
+- [x] Criar ou corrigir a página (adicionar rota /quick-record)
+- [x] Testar a aba NOVOS REGISTROS
