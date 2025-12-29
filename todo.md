@@ -252,3 +252,12 @@
 - [x] Adicionar meta description (entre 50-160 caracteres)
 - [x] Adicionar palavras-chave relevantes no conteúdo
 - [x] Testar SEO na página inicial
+
+
+## Implementação da Página EQUIPE (Reportado pelo usuário - erro 404)
+- [x] Criar arquivo Team.tsx com interface de gerenciamento
+- [x] Adicionar rota /team no App.tsx
+- [x] Implementar tabela de usuários com permissões
+- [ ] Criar procedures tRPC para gerenciamento de equipe (persistência)
+- [ ] Adicionar funcionalidade de convite de usuários
+- [x] Testar a página /team
