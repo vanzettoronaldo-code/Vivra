@@ -1,6 +1,6 @@
 import { eq, and, desc, or, gte, lte, like, count } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
-import { InsertUser, users, companies, assets, timelineRecords, attachments, recurrenceAnalysis, alerts } from "../drizzle/schema";
+import { InsertUser, users, companies, assets, timelineRecords, attachments, recurrenceAnalysis, alerts, auditLogs, emailNotifications } from "../drizzle/schema";
 import { ENV } from './_core/env';
 
 let _db: ReturnType<typeof drizzle> | null = null;
@@ -470,4 +470,179 @@ export async function rejectRecord(approvalRequestId: number, userId: number, re
     .where(eq(approvalRequests.id, approvalRequestId));
   
   return result;
+}
+
+
+// Audit logging helpers
+export async function logAuditAction(
+  companyId: number,
+  userId: number,
+  action: string,
+  entityType: string,
+  entityId: number,
+  changes?: string,
+  description?: string,
+  ipAddress?: string,
+  userAgent?: string
+) {
+  const db = await getDb();
+  if (!db) return;
+
+  try {
+    await db.insert(auditLogs).values({
+      companyId,
+      userId,
+      action,
+      entityType,
+      entityId,
+      changes,
+      description,
+      ipAddress,
+      userAgent,
+    });
+  } catch (error) {
+    console.error("[Database] Failed to log audit action:", error);
+  }
+}
+
+export async function getAuditLogs(
+  companyId: number,
+  filters?: {
+    userId?: number;
+    action?: string;
+    entityType?: string;
+    startDate?: Date;
+    endDate?: Date;
+    limit?: number;
+    offset?: number;
+  }
+) {
+  const db = await getDb();
+  if (!db) return [];
+
+  try {
+    const conditions = [eq(auditLogs.companyId, companyId)];
+
+    if (filters?.userId) {
+      conditions.push(eq(auditLogs.userId, filters.userId));
+    }
+    if (filters?.action) {
+      conditions.push(eq(auditLogs.action, filters.action));
+    }
+    if (filters?.entityType) {
+      conditions.push(eq(auditLogs.entityType, filters.entityType));
+    }
+
+    const results = await db
+      .select()
+      .from(auditLogs)
+      .where(and(...conditions))
+      .orderBy(desc(auditLogs.createdAt));
+
+    let filtered = results;
+    if (filters?.limit) {
+      filtered = filtered.slice(0, filters.limit);
+    }
+    if (filters?.offset) {
+      filtered = filtered.slice(filters.offset);
+    }
+
+    return filtered;
+  } catch (error) {
+    console.error("[Database] Failed to get audit logs:", error);
+    return [];
+  }
+}
+
+// Email notification helpers
+export async function createEmailNotification(
+  companyId: number,
+  recipientUserId: number,
+  approvalRequestId: number,
+  subject: string,
+  body: string
+) {
+  const db = await getDb();
+  if (!db) return null;
+
+  try {
+    const result = await db.insert(emailNotifications).values({
+      companyId,
+      recipientUserId,
+      approvalRequestId,
+      subject,
+      body,
+      status: "pending",
+    });
+    return result;
+  } catch (error) {
+    console.error("[Database] Failed to create email notification:", error);
+    return null;
+  }
+}
+
+export async function getPendingEmailNotifications(limit = 10) {
+  const db = await getDb();
+  if (!db) return [];
+
+  try {
+    return await db
+      .select()
+      .from(emailNotifications)
+      .where(eq(emailNotifications.status, "pending"))
+      .limit(limit);
+  } catch (error) {
+    console.error("[Database] Failed to get pending email notifications:", error);
+    return [];
+  }
+}
+
+export async function markEmailAsSent(notificationId: number) {
+  const db = await getDb();
+  if (!db) return false;
+
+  try {
+    await db
+      .update(emailNotifications)
+      .set({
+        status: "sent",
+        sentAt: new Date(),
+      })
+      .where(eq(emailNotifications.id, notificationId));
+    return true;
+  } catch (error) {
+    console.error("[Database] Failed to mark email as sent:", error);
+    return false;
+  }
+}
+
+export async function markEmailAsFailed(notificationId: number, reason: string) {
+  const db = await getDb();
+  if (!db) return false;
+
+  try {
+    const notification = await db
+      .select()
+      .from(emailNotifications)
+      .where(eq(emailNotifications.id, notificationId))
+      .limit(1);
+
+    if (!notification.length) return false;
+
+    const retryCount = (notification[0].retryCount || 0) + 1;
+    const status = retryCount >= 3 ? "failed" : "pending";
+
+    await db
+      .update(emailNotifications)
+      .set({
+        status,
+        failureReason: reason,
+        retryCount,
+      })
+      .where(eq(emailNotifications.id, notificationId));
+    return true;
+  } catch (error) {
+    console.error("[Database] Failed to mark email as failed:", error);
+    return false;
+  }
 }

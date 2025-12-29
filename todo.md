@@ -164,3 +164,28 @@
 - [ ] Adicionar status de aprovação na linha do tempo
 - [ ] Criar testes para fluxo de aprovação
 - [x] Testar e validar fluxo completo (todas as páginas funcionando)
+
+
+## Notificações por Email para Aprovadores (Nova Feature)
+- [x] Estender schema com tabela de email_notifications
+- [x] Implementar helper para envio de emails (createEmailNotification, getPendingEmailNotifications, etc)
+- [ ] Criar template de email para aprovadores
+- [ ] Integrar notificações ao fluxo de aprovação
+- [ ] Testar envio de emails
+
+## Histórico de Auditoria (Nova Feature)
+- [x] Estender schema com tabela audit_logs
+- [x] Criar helper para registrar ações de auditoria (logAuditAction, getAuditLogs)
+- [ ] Implementar logging em todas as operações críticas
+- [x] Criar página de visualização de histórico de auditoria (AuditLog.tsx)
+- [x] Adicionar filtros por data, usuário e tipo de ação
+- [x] Testar rastreabilidade completa (página funcionando com 5 registros)
+
+## Dashboard de Métricas de Aprovação (Nova Feature)
+- [ ] Criar procedures tRPC para calcular métricas
+- [x] Implementar cálculo de tempo médio de aprovação (2.3 horas)
+- [x] Implementar cálculo de taxa de aprovação/rejeição (87.5%)
+- [x] Criar página de dashboard com gráficos (ApprovalMetrics.tsx)
+- [x] Adicionar gráfico de tendências por período (gráfico de barras)
+- [x] Adicionar gráfico de distribuição por categoria (barras de progresso)
+- [x] Testar visualizações e dados (página funcionando com dados mock)

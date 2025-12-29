@@ -14,6 +14,8 @@ import QuickRecord from "./pages/QuickRecord";
 import Page2 from "./pages/Page2";
 import ApprovalSettings from "./pages/ApprovalSettings";
 import ApprovalNotifications from "./pages/ApprovalNotifications";
+import AuditLog from "./pages/AuditLog";
+import ApprovalMetrics from "./pages/ApprovalMetrics";
 
 function Router() {
   const { isAuthenticated, loading } = useAuth();
@@ -46,9 +48,10 @@ function Router() {
         <Route path={"/some-path"} component={Page2} />
         <Route path={"/approval-settings"} component={ApprovalSettings} />
         <Route path={"/approval-notifications"} component={ApprovalNotifications} />
+        <Route path={"/audit-log"} component={AuditLog} />
+        <Route path={"/approval-metrics"} component={ApprovalMetrics} />
         <Route path={"/404"} component={NotFound} />
-        <Route component={NotFound} />
-      </Switch>
+        <Route component={NotFound} />      </Switch>
     </DashboardLayout>
   );
 }
