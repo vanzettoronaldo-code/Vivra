@@ -243,3 +243,12 @@
 - [x] Implementar seleção de idioma funcional
 - [x] Testar abertura do diálogo de configurações
 - [x] Testar todas as 3 abas (Perfil, Aprovações, Notificações)
+
+
+## Correções de SEO (Reportado pelo usuário)
+- [x] Adicionar título H1 na página inicial
+- [x] Adicionar títulos H2 nas seções
+- [x] Corrigir meta title (entre 30-60 caracteres)
+- [x] Adicionar meta description (entre 50-160 caracteres)
+- [x] Adicionar palavras-chave relevantes no conteúdo
+- [x] Testar SEO na página inicial
