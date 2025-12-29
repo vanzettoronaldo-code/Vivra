@@ -22,6 +22,7 @@ import Intelligence from "./pages/Intelligence";
 import Metrics from "./pages/Metrics";
 import ScheduledReports from "./pages/ScheduledReports";
 import Integrations from "./pages/Integrations";
+import Alerts from "./pages/Alerts";
 
 function Router() {
   const { isAuthenticated, loading } = useAuth();
@@ -65,6 +66,8 @@ function Router() {
         <Route path={"/scheduled-reports"} component={ScheduledReports} />
         <Route path={"/integracoes"} component={Integrations} />
         <Route path={"/integrations"} component={Integrations} />
+        <Route path={"/alertas"} component={Alerts} />
+        <Route path={"/alerts"} component={Alerts} />
         <Route path={"/404"} component={NotFound} />
         <Route component={NotFound} />      </Switch>
     </DashboardLayout>
