@@ -646,3 +646,67 @@ export async function markEmailAsFailed(notificationId: number, reason: string) 
     return false;
   }
 }
+
+
+/**
+ * User preferences
+ */
+export async function updateUserPreferences(userId: number, preferences: {
+  approvalPrefCriticalRecords?: boolean;
+  approvalPrefImportantDecisions?: boolean;
+  approvalPrefHighSeverity?: boolean;
+  approvalPrefAutoNotify?: boolean;
+  notifPrefNewRecords?: boolean;
+  notifPrefCriticalProblems?: boolean;
+  notifPrefWeeklySummary?: boolean;
+}) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  const updateData: Record<string, unknown> = {};
+  
+  if (preferences.approvalPrefCriticalRecords !== undefined) {
+    updateData.approvalPrefCriticalRecords = preferences.approvalPrefCriticalRecords;
+  }
+  if (preferences.approvalPrefImportantDecisions !== undefined) {
+    updateData.approvalPrefImportantDecisions = preferences.approvalPrefImportantDecisions;
+  }
+  if (preferences.approvalPrefHighSeverity !== undefined) {
+    updateData.approvalPrefHighSeverity = preferences.approvalPrefHighSeverity;
+  }
+  if (preferences.approvalPrefAutoNotify !== undefined) {
+    updateData.approvalPrefAutoNotify = preferences.approvalPrefAutoNotify;
+  }
+  if (preferences.notifPrefNewRecords !== undefined) {
+    updateData.notifPrefNewRecords = preferences.notifPrefNewRecords;
+  }
+  if (preferences.notifPrefCriticalProblems !== undefined) {
+    updateData.notifPrefCriticalProblems = preferences.notifPrefCriticalProblems;
+  }
+  if (preferences.notifPrefWeeklySummary !== undefined) {
+    updateData.notifPrefWeeklySummary = preferences.notifPrefWeeklySummary;
+  }
+
+  if (Object.keys(updateData).length === 0) {
+    return;
+  }
+
+  await db.update(users).set(updateData).where(eq(users.id, userId));
+}
+
+export async function getUserPreferences(userId: number) {
+  const db = await getDb();
+  if (!db) return null;
+
+  const result = await db.select({
+    approvalPrefCriticalRecords: users.approvalPrefCriticalRecords,
+    approvalPrefImportantDecisions: users.approvalPrefImportantDecisions,
+    approvalPrefHighSeverity: users.approvalPrefHighSeverity,
+    approvalPrefAutoNotify: users.approvalPrefAutoNotify,
+    notifPrefNewRecords: users.notifPrefNewRecords,
+    notifPrefCriticalProblems: users.notifPrefCriticalProblems,
+    notifPrefWeeklySummary: users.notifPrefWeeklySummary,
+  }).from(users).where(eq(users.id, userId)).limit(1);
+
+  return result.length > 0 ? result[0] : null;
+}

@@ -22,6 +22,8 @@ import {
   getTimelineRecordsByDateRange,
   getTimelineRecordsByAuthor,
   getTimelineRecordStats,
+  updateUserPreferences,
+  getUserPreferences,
 } from "./db";
 import { TRPCError } from "@trpc/server";
 
@@ -353,6 +355,47 @@ export const appRouter = router({
 
         const fileKey = `companies/${ctx.user.companyId}/assets/${input.assetId}/audio/${Date.now()}-${input.fileName}`;
         return { fileKey, contentType: input.contentType };
+      }),
+  }),
+
+  /**
+   * User preferences procedures
+   */
+  user: router({
+    /**
+     * Get current user's preferences
+     */
+    getPreferences: protectedProcedure.query(async ({ ctx }) => {
+      if (!ctx.user.id) throw new TRPCError({ code: "UNAUTHORIZED" });
+      const preferences = await getUserPreferences(ctx.user.id);
+      return preferences || {
+        approvalPrefCriticalRecords: true,
+        approvalPrefImportantDecisions: true,
+        approvalPrefHighSeverity: true,
+        approvalPrefAutoNotify: true,
+        notifPrefNewRecords: true,
+        notifPrefCriticalProblems: true,
+        notifPrefWeeklySummary: true,
+      };
+    }),
+
+    /**
+     * Update user's preferences
+     */
+    updatePreferences: protectedProcedure
+      .input(z.object({
+        approvalPrefCriticalRecords: z.boolean().optional(),
+        approvalPrefImportantDecisions: z.boolean().optional(),
+        approvalPrefHighSeverity: z.boolean().optional(),
+        approvalPrefAutoNotify: z.boolean().optional(),
+        notifPrefNewRecords: z.boolean().optional(),
+        notifPrefCriticalProblems: z.boolean().optional(),
+        notifPrefWeeklySummary: z.boolean().optional(),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        if (!ctx.user.id) throw new TRPCError({ code: "UNAUTHORIZED" });
+        await updateUserPreferences(ctx.user.id, input);
+        return { success: true };
       }),
   }),
 });

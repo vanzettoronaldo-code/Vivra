@@ -1,0 +1,9 @@
+{
+  "query": "ALTER TABLE users ADD COLUMN IF NOT EXISTS approvalPrefCriticalRecords BOOLEAN DEFAULT TRUE NOT NULL;\nALTER TABLE users ADD COLUMN IF NOT EXISTS approvalPrefImportantDecisions BOOLEAN DEFAULT TRUE NOT NULL;\nALTER TABLE users ADD COLUMN IF NOT EXISTS approvalPrefHighSeverity BOOLEAN DEFAULT TRUE NOT NULL;\nALTER TABLE users ADD COLUMN IF NOT EXISTS approvalPrefAutoNotify BOOLEAN DEFAULT TRUE NOT NULL;\nALTER TABLE users ADD COLUMN IF NOT EXISTS notifPrefNewRecords BOOLEAN DEFAULT TRUE NOT NULL;\nALTER TABLE users ADD COLUMN IF NOT EXISTS notifPrefCriticalProblems BOOLEAN DEFAULT TRUE NOT NULL;\nALTER TABLE users ADD COLUMN IF NOT EXISTS notifPrefWeeklySummary BOOLEAN DEFAULT TRUE NOT NULL;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4BCkJEev24JMwve.root --database 6E78f2XtpdcnWJdcz797eT --execute ALTER TABLE users ADD COLUMN IF NOT EXISTS approvalPrefCriticalRecords BOOLEAN DEFAULT TRUE NOT NULL;\nALTER TABLE users ADD COLUMN IF NOT EXISTS approvalPrefImportantDecisions BOOLEAN DEFAULT TRUE NOT NULL;\nALTER TABLE users ADD COLUMN IF NOT EXISTS approvalPrefHighSeverity BOOLEAN DEFAULT TRUE NOT NULL;\nALTER TABLE users ADD COLUMN IF NOT EXISTS approvalPrefAutoNotify BOOLEAN DEFAULT TRUE NOT NULL;\nALTER TABLE users ADD COLUMN IF NOT EXISTS notifPrefNewRecords BOOLEAN DEFAULT TRUE NOT NULL;\nALTER TABLE users ADD COLUMN IF NOT EXISTS notifPrefCriticalProblems BOOLEAN DEFAULT TRUE NOT NULL;\nALTER TABLE users ADD COLUMN IF NOT EXISTS notifPrefWeeklySummary BOOLEAN DEFAULT TRUE NOT NULL;",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 2805
+}

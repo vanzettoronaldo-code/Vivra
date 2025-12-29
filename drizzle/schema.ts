@@ -14,6 +14,15 @@ export const users = mysqlTable("users", {
   role: mysqlEnum("role", ["user", "admin"]).default("user").notNull(),
   companyId: int("companyId"),
   userRole: mysqlEnum("userRole", ["admin", "collaborator", "viewer"]).default("collaborator").notNull(),
+  // Approval preferences
+  approvalPrefCriticalRecords: boolean("approvalPrefCriticalRecords").default(true).notNull(),
+  approvalPrefImportantDecisions: boolean("approvalPrefImportantDecisions").default(true).notNull(),
+  approvalPrefHighSeverity: boolean("approvalPrefHighSeverity").default(true).notNull(),
+  approvalPrefAutoNotify: boolean("approvalPrefAutoNotify").default(true).notNull(),
+  // Notification preferences
+  notifPrefNewRecords: boolean("notifPrefNewRecords").default(true).notNull(),
+  notifPrefCriticalProblems: boolean("notifPrefCriticalProblems").default(true).notNull(),
+  notifPrefWeeklySummary: boolean("notifPrefWeeklySummary").default(true).notNull(),
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
   lastSignedIn: timestamp("lastSignedIn").defaultNow().notNull(),

@@ -201,3 +201,32 @@
 - [x] Integrar notificações a atualizações de ativos (simulador de notificações)
 - [x] Adicionar persistência de notificações no banco (email_notifications table)
 - [x] Testar notificações em tempo real (painel de notificações funcionando)
+
+
+## Menu de Navegação Expandido (Nova Feature)
+- [ ] Adicionar item DASHBOARDS ao menu
+- [ ] Adicionar item ATIVOS ao menu
+- [ ] Adicionar item +NOVOS REGISTROS ao menu
+- [ ] Adicionar item APROVAÇÕES ao menu
+- [ ] Adicionar item INTELIGÊNCIA ao menu
+- [ ] Adicionar item EQUIPE ao menu
+- [ ] Criar páginas para cada menu item
+
+## Menu de Configurações com Abas (Nova Feature)
+- [x] Criar modal/página de configurações (SettingsDialog.tsx)
+- [x] Implementar aba PERFIL com edição de dados
+- [x] Implementar aba APROVAÇÕES com checkboxes
+- [x] Implementar aba NOTIFICAÇÕES com preferências
+- [x] Integrar menu de configurações ao avatar do usuário
+- [x] Salvar preferências no banco de dados
+- [x] Adicionar colunas de preferências na tabela users (7 novas colunas)
+- [x] Criar procedures tRPC para salvar e recuperar preferências
+- [ ] Testar menu de configurações no navegador
+- [ ] Corrigir dropdown menu se necessário
+
+## Melhorias nos Dashboards (Nova Feature)
+- [ ] Melhorar Dashboard com visão geral dos ativos
+- [ ] Melhorar Gestão de usuários e permissões
+- [ ] Criar painel de inteligência com padrões identificados
+- [ ] Otimizar Registro rápido para celular
+- [ ] Melhorar Linha do tempo da memória técnica

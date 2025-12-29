@@ -21,17 +21,23 @@ import {
 } from "@/components/ui/sidebar";
 import { getLoginUrl } from "@/const";
 import { useIsMobile } from "@/hooks/useMobile";
-import { LayoutDashboard, LogOut, PanelLeft, Users, Globe } from "lucide-react";
+import { LayoutDashboard, LogOut, PanelLeft, Users, Globe, BarChart3, Plus, CheckSquare, Lightbulb, Users2 } from "lucide-react";
 import { NotificationBell } from "./NotificationCenter";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { CSSProperties, useEffect, useRef, useState } from "react";
 import { useLocation } from "wouter";
 import { DashboardLayoutSkeleton } from './DashboardLayoutSkeleton';
 import { Button } from "./ui/button";
+import { SettingsDialog } from "./SettingsDialog";
+import { Settings } from "lucide-react";
 
 const menuItems = [
-  { icon: LayoutDashboard, label: "Page 1", path: "/" },
-  { icon: Users, label: "Page 2", path: "/some-path" },
+  { icon: BarChart3, label: "DASHBOARDS", path: "/" },
+  { icon: LayoutDashboard, label: "ATIVOS", path: "/dashboard" },
+  { icon: Plus, label: "+ NOVOS REGISTROS", path: "/quick-record" },
+  { icon: CheckSquare, label: "APROVACOES", path: "/approval-notifications" },
+  { icon: Lightbulb, label: "INTELIGENCIA", path: "/approval-metrics" },
+  { icon: Users2, label: "EQUIPE", path: "/team" },
 ];
 
 const SIDEBAR_WIDTH_KEY = "sidebar-width";
@@ -49,6 +55,7 @@ export default function DashboardLayout({
     return saved ? parseInt(saved, 10) : DEFAULT_WIDTH;
   });
   const { loading, user } = useAuth();
+  const [settingsOpen, setSettingsOpen] = useState(false);
 
   useEffect(() => {
     localStorage.setItem(SIDEBAR_WIDTH_KEY, sidebarWidth.toString());
@@ -116,6 +123,7 @@ function DashboardLayoutContent({
   const sidebarRef = useRef<HTMLDivElement>(null);
   const activeMenuItem = menuItems.find(item => item.path === location);
   const isMobile = useIsMobile();
+  const [settingsOpen, setSettingsOpen] = useState(false);
 
   useEffect(() => {
     if (isCollapsed) {
@@ -223,6 +231,13 @@ function DashboardLayoutContent({
                 </button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-48">
+                <DropdownMenuItem
+                  onClick={() => setSettingsOpen(true)}
+                  className="cursor-pointer"
+                >
+                  <Settings className="mr-2 h-4 w-4" />
+                  <span>Configuracoes</span>
+                </DropdownMenuItem>
                 <LanguageSelector />
                 <DropdownMenuItem
                   onClick={logout}
@@ -235,6 +250,7 @@ function DashboardLayoutContent({
             </DropdownMenu>
           </SidebarFooter>
         </Sidebar>
+        <SettingsDialog open={settingsOpen} onOpenChange={setSettingsOpen} />
         <div
           className={`absolute top-0 right-0 w-1 h-full cursor-col-resize hover:bg-primary/20 transition-colors ${isCollapsed ? "hidden" : ""}`}
           onMouseDown={() => {
