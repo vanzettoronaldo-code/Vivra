@@ -49,7 +49,6 @@ function Router() {
     <DashboardLayout>
       <Switch>
         <Route path={"/"} component={Dashboard} />
-        <Route path={"/dashboard"} component={Dashboard} />
         <Route path={"/asset/:assetId"} component={AssetDetail} />
         <Route path={"/asset/:assetId/quick-record"} component={QuickRecord} />
         <Route path={"/some-path"} component={Page2} />
@@ -57,7 +56,8 @@ function Router() {
         <Route path={"/approval-notifications"} component={ApprovalNotifications} />
         <Route path={"/audit-log"} component={AuditLog} />
         <Route path={"/approval-metrics"} component={ApprovalMetrics} />
-        <Route path={"/team"} component={Team} />        <Route path={"/quick-record"} component={QuickRecord} />
+        <Route path={"/team"} component={Team} />
+        <Route path={"/quick-record"} component={QuickRecord} />
         <Route path={"/inteligencia"} component={Intelligence} />
         <Route path={"/intelligence"} component={Intelligence} />
         <Route path={"/metricas"} component={Metrics} />
@@ -68,8 +68,9 @@ function Router() {
         <Route path={"/integrations"} component={Integrations} />
         <Route path={"/alertas"} component={Alerts} />
         <Route path={"/alerts"} component={Alerts} />
-        <Route path={"/404"} component={NotFound} />
-        <Route component={NotFound} />      </Switch>
+       <Route path={"/404"} component={NotFound} />
+        <Route component={NotFound} />
+      </Switch>
     </DashboardLayout>
   );
 }
