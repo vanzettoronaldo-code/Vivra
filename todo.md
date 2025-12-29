@@ -130,3 +130,13 @@
 - [x] Adicionar indicador de progresso de upload
 - [x] Implementar validação de formulário
 - [ ] Testar em dispositivos móveis
+
+
+## Integração S3 para Upload de Mídia (Nova Feature)
+- [x] Criar procedures tRPC para gerar URLs presigned
+- [x] Implementar upload de fotos para S3
+- [x] Implementar upload de áudio para S3
+- [x] Criar procedures para armazenar referências de anexos
+- [x] Integrar S3 com página QuickRecord
+- [x] Testar URLs assinadas e validação
+- [x] Implementar tratamento de erros de upload

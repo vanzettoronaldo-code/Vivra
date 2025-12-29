@@ -2,7 +2,7 @@ import { useParams, useLocation } from "wouter";
 import { useState, useRef } from "react";
 import { trpc } from "@/lib/trpc";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
@@ -16,6 +16,23 @@ import {
 import { Progress } from "@/components/ui/progress";
 import { toast } from "sonner";
 import { ArrowLeft, Camera, Mic, Upload, X, Volume2, Loader2 } from "lucide-react";
+import { uploadPhotoToS3, uploadAudioToS3 } from "@/components/S3Upload";
+
+interface PhotoWithPreview {
+  file: File;
+  preview: string;
+  uploading?: boolean;
+  uploaded?: boolean;
+  url?: string;
+}
+
+interface AudioWithTranscription {
+  file: File;
+  uploading?: boolean;
+  uploaded?: boolean;
+  url?: string;
+  transcription?: string;
+}
 
 export default function QuickRecord() {
   const params = useParams<{ assetId: string }>();
@@ -25,12 +42,11 @@ export default function QuickRecord() {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [category, setCategory] = useState<"problem" | "maintenance" | "decision" | "inspection">("problem");
-  const [photos, setPhotos] = useState<{ file: File; preview: string }[]>([]);
-  const [audioFile, setAudioFile] = useState<File | null>(null);
-  const [audioTranscription, setAudioTranscription] = useState<string>("");
+  const [photos, setPhotos] = useState<PhotoWithPreview[]>([]);
+  const [audio, setAudio] = useState<AudioWithTranscription | null>(null);
   const [isRecording, setIsRecording] = useState(false);
   const [isTranscribing, setIsTranscribing] = useState(false);
-  const [uploadProgress, setUploadProgress] = useState(0);
+  const [overallProgress, setOverallProgress] = useState(0);
 
   const cameraInputRef = useRef<HTMLInputElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -39,53 +55,54 @@ export default function QuickRecord() {
 
   const createRecordMutation = trpc.timeline.create.useMutation({
     onSuccess: async (result: any) => {
-      // Upload attachments if any
-      if (photos.length > 0 || audioFile) {
-        try {
-          setUploadProgress(10);
+      try {
+        setOverallProgress(10);
 
-          // Upload photos
-          for (let i = 0; i < photos.length; i++) {
-            const photo = photos[i].file;
-            const formData = new FormData();
-            formData.append("file", photo);
-            formData.append("type", "photo");
-            formData.append("recordId", result.id?.toString() || "");
-
-            // Note: This would need a proper upload endpoint
-            // For now, we'll just track progress
-            setUploadProgress(10 + ((i + 1) / (photos.length + 1)) * 40);
+        // Upload photos to S3
+        for (let i = 0; i < photos.length; i++) {
+          const photo = photos[i];
+          if (!photo.uploaded && photo.file) {
+            try {
+              const uploadResult = await uploadPhotoToS3(photo.file, assetId, 1); // TODO: Get companyId from context
+              setPhotos((prev) =>
+                prev.map((p, idx) =>
+                  idx === i ? { ...p, uploaded: true, url: uploadResult.url } : p
+                )
+              );
+              setOverallProgress(10 + ((i + 1) / (photos.length + 1)) * 40);
+            } catch (error) {
+              console.error("Photo upload error:", error);
+              toast.error(`Erro ao fazer upload da foto ${i + 1}`);
+            }
           }
-
-          // Upload audio if exists
-          if (audioFile) {
-            setUploadProgress(50);
-            const formData = new FormData();
-            formData.append("file", audioFile);
-            formData.append("type", "audio");
-            formData.append("recordId", result.id?.toString() || "");
-            formData.append("transcription", audioTranscription);
-
-            // Note: This would need a proper upload endpoint
-            setUploadProgress(90);
-          }
-
-          setUploadProgress(100);
-        } catch (error) {
-          console.error("Error uploading attachments:", error);
-          toast.error("Erro ao fazer upload dos anexos");
         }
-      }
 
-      toast.success("Registro criado com sucesso!");
-      setTitle("");
-      setDescription("");
-      setCategory("problem");
-      setPhotos([]);
-      setAudioFile(null);
-      setAudioTranscription("");
-      setUploadProgress(0);
-      setLocation(`/asset/${assetId}`);
+        // Upload audio to S3
+        if (audio && !audio.uploaded && audio.file) {
+          try {
+            setOverallProgress(50);
+            const uploadResult = await uploadAudioToS3(audio.file, assetId, 1); // TODO: Get companyId from context
+            setAudio((prev) => prev ? { ...prev, uploaded: true, url: uploadResult.url } : null);
+            setOverallProgress(90);
+          } catch (error) {
+            console.error("Audio upload error:", error);
+            toast.error("Erro ao fazer upload do áudio");
+          }
+        }
+
+        setOverallProgress(100);
+        toast.success("Registro criado com sucesso!");
+        setTitle("");
+        setDescription("");
+        setCategory("problem");
+        setPhotos([]);
+        setAudio(null);
+        setOverallProgress(0);
+        setLocation(`/asset/${assetId}`);
+      } catch (error) {
+        console.error("Error uploading attachments:", error);
+        toast.error("Erro ao fazer upload dos anexos");
+      }
     },
     onError: (error) => {
       toast.error(error.message || "Erro ao criar registro");
@@ -107,6 +124,8 @@ export default function QuickRecord() {
             {
               file,
               preview: event.target?.result as string,
+              uploading: false,
+              uploaded: false,
             },
           ]);
         };
@@ -135,7 +154,11 @@ export default function QuickRecord() {
         const audioFile = new File([audioBlob], `recording-${Date.now()}.webm`, {
           type: "audio/webm",
         });
-        setAudioFile(audioFile);
+        setAudio({
+          file: audioFile,
+          uploading: false,
+          uploaded: false,
+        });
         stream.getTracks().forEach((track) => track.stop());
         toast.success("Áudio gravado com sucesso!");
       };
@@ -156,15 +179,13 @@ export default function QuickRecord() {
   };
 
   const handleTranscribeAudio = async () => {
-    if (!audioFile) return;
+    if (!audio?.file) return;
 
     setIsTranscribing(true);
     try {
-      // Create FormData with audio file
       const formData = new FormData();
-      formData.append("audio", audioFile);
+      formData.append("audio", audio.file);
 
-      // Send to transcription endpoint
       const response = await fetch("/api/transcribe", {
         method: "POST",
         body: formData,
@@ -175,7 +196,7 @@ export default function QuickRecord() {
       }
 
       const data = await response.json();
-      setAudioTranscription(data.transcription || "");
+      setAudio((prev) => prev ? { ...prev, transcription: data.transcription } : null);
       toast.success("Áudio transcrito com sucesso!");
     } catch (error) {
       console.error("Transcription error:", error);
@@ -186,8 +207,7 @@ export default function QuickRecord() {
   };
 
   const handleRemoveAudio = () => {
-    setAudioFile(null);
-    setAudioTranscription("");
+    setAudio(null);
   };
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -197,12 +217,11 @@ export default function QuickRecord() {
       return;
     }
 
-    // If there's audio transcription, add it to description
     let finalDescription = description;
-    if (audioTranscription) {
+    if (audio?.transcription) {
       finalDescription = finalDescription
-        ? `${finalDescription}\n\n[Transcrição de áudio]\n${audioTranscription}`
-        : `[Transcrição de áudio]\n${audioTranscription}`;
+        ? `${finalDescription}\n\n[Transcrição de áudio]\n${audio.transcription}`
+        : `[Transcrição de áudio]\n${audio.transcription}`;
     }
 
     createRecordMutation.mutate({
@@ -316,6 +335,16 @@ export default function QuickRecord() {
                         alt={`Photo ${index + 1}`}
                         className="w-full h-full object-cover"
                       />
+                      {photo.uploading && (
+                        <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+                          <Loader2 className="w-4 h-4 animate-spin text-white" />
+                        </div>
+                      )}
+                      {photo.uploaded && (
+                        <div className="absolute inset-0 bg-green-500 bg-opacity-50 flex items-center justify-center">
+                          <span className="text-white text-xs font-bold">✓</span>
+                        </div>
+                      )}
                       <Button
                         type="button"
                         variant="ghost"
@@ -325,9 +354,6 @@ export default function QuickRecord() {
                       >
                         <X className="w-3 h-3" />
                       </Button>
-                      <span className="absolute bottom-0 left-0 right-0 bg-black bg-opacity-50 text-white text-xs p-1 truncate">
-                        {photos.length > 1 ? `${index + 1}/${photos.length}` : ""}
-                      </span>
                     </div>
                   ))}
                 </div>
@@ -379,15 +405,15 @@ export default function QuickRecord() {
                 )}
               </div>
 
-              {audioFile && (
+              {audio && (
                 <div className="bg-slate-100 rounded p-3 mb-3 space-y-2">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
                       <Volume2 className="w-4 h-4 text-slate-600" />
                       <div>
-                        <p className="text-sm font-medium">{audioFile.name}</p>
+                        <p className="text-sm font-medium">{audio.file.name}</p>
                         <p className="text-xs text-slate-600">
-                          {(audioFile.size / 1024).toFixed(1)} KB
+                          {(audio.file.size / 1024).toFixed(1)} KB
                         </p>
                       </div>
                     </div>
@@ -401,7 +427,7 @@ export default function QuickRecord() {
                     </Button>
                   </div>
 
-                  {!audioTranscription && (
+                  {!audio.transcription && (
                     <Button
                       type="button"
                       variant="outline"
@@ -421,10 +447,10 @@ export default function QuickRecord() {
                     </Button>
                   )}
 
-                  {audioTranscription && (
+                  {audio.transcription && (
                     <div className="bg-white rounded p-2 border border-slate-200">
                       <p className="text-xs font-medium text-slate-600 mb-1">Transcrição:</p>
-                      <p className="text-sm text-slate-700 line-clamp-3">{audioTranscription}</p>
+                      <p className="text-sm text-slate-700 line-clamp-3">{audio.transcription}</p>
                     </div>
                   )}
                 </div>
@@ -432,13 +458,13 @@ export default function QuickRecord() {
             </div>
 
             {/* Upload Progress */}
-            {uploadProgress > 0 && uploadProgress < 100 && (
+            {overallProgress > 0 && overallProgress < 100 && (
               <div className="border-t pt-4">
                 <div className="flex items-center justify-between mb-2">
                   <p className="text-sm font-medium">Enviando anexos...</p>
-                  <p className="text-sm text-slate-600">{uploadProgress}%</p>
+                  <p className="text-sm text-slate-600">{Math.round(overallProgress)}%</p>
                 </div>
-                <Progress value={uploadProgress} className="h-2" />
+                <Progress value={overallProgress} className="h-2" />
               </div>
             )}
 

@@ -314,6 +314,47 @@ export const appRouter = router({
         return await getAlertsByCompanyId(ctx.user.companyId);
       }),
   }),
+
+  /**
+   * Storage procedures for S3 uploads
+   */
+  storage: router({
+    /**
+     * Get presigned URL for photo upload
+     */
+    getPhotoUploadUrl: protectedProcedure
+      .input(z.object({
+        assetId: z.number(),
+        fileName: z.string(),
+        contentType: z.string(),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        if (!ctx.user.id || !ctx.user.companyId) {
+          throw new TRPCError({ code: "UNAUTHORIZED" });
+        }
+
+        const fileKey = `companies/${ctx.user.companyId}/assets/${input.assetId}/photos/${Date.now()}-${input.fileName}`;
+        return { fileKey, contentType: input.contentType };
+      }),
+
+    /**
+     * Get presigned URL for audio upload
+     */
+    getAudioUploadUrl: protectedProcedure
+      .input(z.object({
+        assetId: z.number(),
+        fileName: z.string(),
+        contentType: z.string(),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        if (!ctx.user.id || !ctx.user.companyId) {
+          throw new TRPCError({ code: "UNAUTHORIZED" });
+        }
+
+        const fileKey = `companies/${ctx.user.companyId}/assets/${input.assetId}/audio/${Date.now()}-${input.fileName}`;
+        return { fileKey, contentType: input.contentType };
+      }),
+  }),
 });
 
 export type AppRouter = typeof appRouter;
