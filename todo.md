@@ -278,3 +278,12 @@
 - [ ] Refinar tipografia e espaçamento
 - [ ] Atualizar componentes (botões, cards, inputs)
 - [ ] Testar design em diferentes resoluções
+
+
+## Implementação das 3 Sugestões de Redesign
+- [x] Criar logo circular com gradiente azul/turquesa
+- [x] Adicionar logo ao DashboardLayout no header
+- [x] Redesenhar página de login com card centralizado (Home.tsx)
+- [x] Refinar tipografia (aumentar tamanhos de título, melhorar line-height)
+- [x] Melhorar espaçamento em cards e componentes
+- [ ] Testar responsividade em mobile

@@ -192,8 +192,9 @@ function DashboardLayoutContent({
               </button>
               {!isCollapsed ? (
                 <div className="flex items-center gap-2 min-w-0">
-                  <span className="font-semibold tracking-tight truncate">
-                    Navigation
+                  <img src="/logo-vivra.png" alt="VIVRA" className="h-6 w-6 shrink-0" />
+                  <span className="font-semibold tracking-tight truncate text-primary">
+                    VIVRA
                   </span>
                 </div>
               ) : null}
