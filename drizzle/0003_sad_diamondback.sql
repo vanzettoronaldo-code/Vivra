@@ -1,0 +1,1 @@
+ALTER TABLE `approval_workflows` MODIFY COLUMN `approverUserIds` text NOT NULL;

@@ -131,3 +131,44 @@ export const alerts = mysqlTable("alerts", {
 
 export type Alert = typeof alerts.$inferSelect;
 export type InsertAlert = typeof alerts.$inferInsert;
+
+/**
+ * Approval workflows - configure which record types require approval
+ */
+export const approvalWorkflows = mysqlTable("approval_workflows", {
+  id: int("id").autoincrement().primaryKey(),
+  companyId: int("companyId").notNull(),
+  name: varchar("name", { length: 255 }).notNull(),
+  description: text("description"),
+  recordCategory: mysqlEnum("recordCategory", ["problem", "maintenance", "decision", "inspection"]).notNull(),
+  requiresApproval: boolean("requiresApproval").default(true).notNull(),
+  approverUserIds: text("approverUserIds").notNull(),
+  isActive: boolean("isActive").default(true).notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type ApprovalWorkflow = typeof approvalWorkflows.$inferSelect;
+export type InsertApprovalWorkflow = typeof approvalWorkflows.$inferInsert;
+
+/**
+ * Approval requests - track approval status of records
+ */
+export const approvalRequests = mysqlTable("approval_requests", {
+  id: int("id").autoincrement().primaryKey(),
+  recordId: int("recordId").notNull(),
+  companyId: int("companyId").notNull(),
+  workflowId: int("workflowId").notNull(),
+  requestedBy: int("requestedBy").notNull(),
+  status: mysqlEnum("status", ["pending", "approved", "rejected"]).default("pending").notNull(),
+  approvedBy: int("approvedBy"),
+  approvalJustification: text("approvalJustification"),
+  rejectionReason: text("rejectionReason"),
+  requestedAt: timestamp("requestedAt").defaultNow().notNull(),
+  respondedAt: timestamp("respondedAt"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type ApprovalRequest = typeof approvalRequests.$inferSelect;
+export type InsertApprovalRequest = typeof approvalRequests.$inferInsert;

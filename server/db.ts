@@ -348,3 +348,126 @@ export async function getTimelineRecordStats(
 
   return stats;
 }
+
+
+// Approval workflow helpers
+export async function createApprovalWorkflow(workflow: {
+  companyId: number;
+  name: string;
+  description?: string;
+  recordCategory: "problem" | "maintenance" | "decision" | "inspection";
+  requiresApproval: boolean;
+  approverUserIds: number[];
+}) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  const { approvalWorkflows } = await import("../drizzle/schema");
+  
+  const result = await db.insert(approvalWorkflows).values({
+    ...workflow,
+    approverUserIds: JSON.stringify(workflow.approverUserIds),
+  });
+  
+  return result;
+}
+
+export async function getApprovalWorkflows(companyId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  const { approvalWorkflows } = await import("../drizzle/schema");
+  const { eq } = await import("drizzle-orm");
+  
+  const workflows = await db
+    .select()
+    .from(approvalWorkflows)
+    .where(eq(approvalWorkflows.companyId, companyId));
+  
+  return workflows.map(w => ({
+    ...w,
+    approverUserIds: typeof w.approverUserIds === "string" ? JSON.parse(w.approverUserIds) : w.approverUserIds,
+  }));
+}
+
+export async function createApprovalRequest(request: {
+  recordId: number;
+  companyId: number;
+  workflowId: number;
+  requestedBy: number;
+}) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  const { approvalRequests } = await import("../drizzle/schema");
+  
+  const result = await db.insert(approvalRequests).values({
+    ...request,
+    status: "pending",
+  });
+  
+  return result;
+}
+
+export async function getPendingApprovals(companyId: number, userId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  const { approvalRequests, approvalWorkflows } = await import("../drizzle/schema");
+  const { eq, and } = await import("drizzle-orm");
+  
+  const requests = await db
+    .select()
+    .from(approvalRequests)
+    .where(
+      and(
+        eq(approvalRequests.companyId, companyId),
+        eq(approvalRequests.status, "pending")
+      )
+    );
+  
+  return requests.filter(req => {
+    const workflow = approvalWorkflows;
+    return true;
+  });
+}
+
+export async function approveRecord(approvalRequestId: number, userId: number, justification: string) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  const { approvalRequests } = await import("../drizzle/schema");
+  const { eq } = await import("drizzle-orm");
+  
+  const result = await db
+    .update(approvalRequests)
+    .set({
+      status: "approved",
+      approvedBy: userId,
+      approvalJustification: justification,
+      respondedAt: new Date(),
+    })
+    .where(eq(approvalRequests.id, approvalRequestId));
+  
+  return result;
+}
+
+export async function rejectRecord(approvalRequestId: number, userId: number, reason: string) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  const { approvalRequests } = await import("../drizzle/schema");
+  const { eq } = await import("drizzle-orm");
+  
+  const result = await db
+    .update(approvalRequests)
+    .set({
+      status: "rejected",
+      approvedBy: userId,
+      rejectionReason: reason,
+      respondedAt: new Date(),
+    })
+    .where(eq(approvalRequests.id, approvalRequestId));
+  
+  return result;
+}

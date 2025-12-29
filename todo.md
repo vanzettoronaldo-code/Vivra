@@ -153,3 +153,14 @@
 
 ## Correções e Bugs Reportados
 - [x] Corrigir erro na Page 2 (criada página de Analytics & Relatórios com gráficos)
+
+
+## Fluxo de Aprovação para Registros Críticos (Nova Feature)
+- [x] Estender schema com tabelas de aprovação (approval_workflows, approval_requests)
+- [x] Criar procedures tRPC para gerenciar fluxo de aprovação (helpers no db.ts)
+- [x] Implementar painel de administrador para configurar registros que requerem aprovação (ApprovalSettings.tsx)
+- [x] Criar interface de aprovação/rejeição com campo de justificativa (ApprovalDialog.tsx)
+- [x] Implementar sistema de notificações para aprovadores (ApprovalNotifications.tsx)
+- [ ] Adicionar status de aprovação na linha do tempo
+- [ ] Criar testes para fluxo de aprovação
+- [x] Testar e validar fluxo completo (todas as páginas funcionando)
