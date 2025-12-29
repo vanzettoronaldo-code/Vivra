@@ -246,7 +246,7 @@ function DashboardLayoutContent({
 
               {/* Custom Dropdown Menu */}
               {userMenuOpen && (
-                <div className="absolute bottom-full left-0 right-0 mb-2 bg-popover border border-border rounded-lg shadow-lg z-50 overflow-hidden">
+                <div className="absolute bottom-full left-0 right-0 mb-2 bg-white border border-border rounded-lg shadow-xl z-50 overflow-hidden">
                   {/* Settings Option */}
                   <button
                     onClick={() => {

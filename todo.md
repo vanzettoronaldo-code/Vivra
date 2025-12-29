@@ -268,3 +268,13 @@
 - [x] Verificar se a página existe
 - [x] Criar ou corrigir a página (adicionar rota /quick-record)
 - [x] Testar a aba NOVOS REGISTROS
+
+
+## Redesign Visual (Baseado em Site de Referência)
+- [x] Atualizar paleta de cores (azul escuro + turquesa + branco)
+- [ ] Criar logo circular com gradiente
+- [ ] Redesenhar página de login com card centralizado
+- [x] Atualizar DashboardLayout com design minimalista (menu refinado)
+- [ ] Refinar tipografia e espaçamento
+- [ ] Atualizar componentes (botões, cards, inputs)
+- [ ] Testar design em diferentes resoluções
