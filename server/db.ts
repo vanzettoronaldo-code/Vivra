@@ -710,3 +710,45 @@ export async function getUserPreferences(userId: number) {
 
   return result.length > 0 ? result[0] : null;
 }
+
+
+/**
+ * Get all recurrence analysis for a company
+ */
+export async function getRecurrenceAnalysisByCompanyId(companyId: number) {
+  const db = await getDb();
+  if (!db) return [];
+  return await db.select().from(recurrenceAnalysis)
+    .where(eq(recurrenceAnalysis.companyId, companyId))
+    .orderBy(desc(recurrenceAnalysis.frequency));
+}
+
+/**
+ * Get timeline records stats for a company
+ */
+export async function getCompanyTimelineStats(companyId: number) {
+  const db = await getDb();
+  if (!db) return null;
+  
+  const allRecords = await db.select().from(timelineRecords)
+    .where(eq(timelineRecords.companyId, companyId));
+
+  if (allRecords.length === 0) return null;
+
+  const stats = {
+    totalRecords: allRecords.length,
+    problemCount: allRecords.filter(r => r.category === "problem").length,
+    maintenanceCount: allRecords.filter(r => r.category === "maintenance").length,
+    decisionCount: allRecords.filter(r => r.category === "decision").length,
+    inspectionCount: allRecords.filter(r => r.category === "inspection").length,
+    byMonth: {} as Record<string, number>,
+  };
+
+  // Group by month
+  allRecords.forEach(record => {
+    const month = new Date(record.recordedAt).toISOString().slice(0, 7);
+    stats.byMonth[month] = (stats.byMonth[month] || 0) + 1;
+  });
+
+  return stats;
+}

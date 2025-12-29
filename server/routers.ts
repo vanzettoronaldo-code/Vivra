@@ -24,6 +24,8 @@ import {
   getTimelineRecordStats,
   updateUserPreferences,
   getUserPreferences,
+  getRecurrenceAnalysisByCompanyId,
+  getCompanyTimelineStats,
 } from "./db";
 import { TRPCError } from "@trpc/server";
 
@@ -356,6 +358,24 @@ export const appRouter = router({
         const fileKey = `companies/${ctx.user.companyId}/assets/${input.assetId}/audio/${Date.now()}-${input.fileName}`;
         return { fileKey, contentType: input.contentType };
       }),
+  }),
+
+  /**
+   * Intelligence procedures
+   */
+  intelligence: router({
+    getRecurrentProblems: protectedProcedure.query(async ({ ctx }) => {
+      if (!ctx.user.id || !ctx.user.companyId) {
+        throw new TRPCError({ code: "UNAUTHORIZED" });
+      }
+      return await getRecurrenceAnalysisByCompanyId(ctx.user.companyId);
+    }),
+    getTimelineStats: protectedProcedure.query(async ({ ctx }) => {
+      if (!ctx.user.id || !ctx.user.companyId) {
+        throw new TRPCError({ code: "UNAUTHORIZED" });
+      }
+      return await getCompanyTimelineStats(ctx.user.companyId);
+    }),
   }),
 
   /**
