@@ -105,27 +105,22 @@ export const appRouter = router({
       // Auto-create company if user doesn't have one
       let companyId = ctx.user.companyId;
       if (!companyId) {
-        const company = await getCompanyByUserId(ctx.user.id);
+        let company = await getCompanyByUserId(ctx.user.id);
         if (!company) {
           const companyName = `${ctx.user.name || 'User'}'s Assets`;
           await createCompany(companyName, undefined, ctx.user.id);
-          const newCompany = await getCompanyByUserId(ctx.user.id);
-          if (!newCompany) {
+          company = await getCompanyByUserId(ctx.user.id);
+          if (!company) {
             throw new TRPCError({ code: "INTERNAL_SERVER_ERROR" });
           }
-          companyId = newCompany.id;
-        } else {
-          companyId = company.id;
         }
-
-        // Update user with companyId
+        companyId = company.id;
         await upsertUser({
           openId: ctx.user.openId,
           companyId,
           userRole: "admin",
         });
       }
-
       return await getAssetsByCompanyId(companyId);
     }),
 

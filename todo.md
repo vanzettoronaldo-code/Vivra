@@ -104,3 +104,4 @@
 - [x] Adicionar procedures de filtros avançados (categoria, data, autor)
 - [x] Adicionar funções de estatística de linha do tempo
 - [x] Dashboard corrigido e funcionando
+- [x] Corrigir erro UNAUTHORIZED quando companyId é null
