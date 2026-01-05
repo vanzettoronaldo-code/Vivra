@@ -1,5 +1,6 @@
 import { eq, and, desc, or, gte, lte, like, count } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
+import mysql from "mysql2/promise";
 import { InsertUser, users, companies, assets, timelineRecords, attachments, recurrenceAnalysis, alerts, auditLogs, emailNotifications, serviceProviders, services, InsertServiceProvider, InsertService } from "../drizzle/schema";
 import { ENV } from './_core/env';
 
@@ -9,10 +10,21 @@ let _db: ReturnType<typeof drizzle> | null = null;
 export async function getDb() {
   if (!_db && process.env.DATABASE_URL) {
     try {
-      _db = drizzle(process.env.DATABASE_URL);
+      const connection = await mysql.createConnection({
+        uri: process.env.DATABASE_URL,
+        ssl: {
+          rejectUnauthorized: true,
+        },
+      });
+      _db = drizzle(connection);
     } catch (error) {
-      console.warn("[Database] Failed to connect:", error);
-      _db = null;
+      console.warn("[Database] Failed to connect with SSL, trying without SSL:", error);
+      try {
+        _db = drizzle(process.env.DATABASE_URL);
+      } catch (innerError) {
+        console.warn("[Database] Failed to connect even without SSL:", innerError);
+        _db = null;
+      }
     }
   }
   return _db;
