@@ -389,15 +389,15 @@ export default function Home() {
               © {new Date().getFullYear()} VIVRA. {isPortuguese ? "Todos os direitos reservados." : "All rights reserved."}
             </p>
             <div className="flex gap-6 text-sm">
-              <a href="#" className="hover:text-white transition-colors">
+              <button onClick={() => window.location.href = getLoginUrl()} className="hover:text-white transition-colors">
                 {isPortuguese ? "Termos de Uso" : "Terms of Service"}
-              </a>
-              <a href="#" className="hover:text-white transition-colors">
+              </button>
+              <button onClick={() => window.location.href = getLoginUrl()} className="hover:text-white transition-colors">
                 {isPortuguese ? "Privacidade" : "Privacy"}
-              </a>
-              <a href="#" className="hover:text-white transition-colors">
+              </button>
+              <button onClick={() => window.location.href = getLoginUrl()} className="hover:text-white transition-colors">
                 {isPortuguese ? "Contato" : "Contact"}
-              </a>
+              </button>
             </div>
           </div>
         </div>
