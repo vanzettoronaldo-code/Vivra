@@ -21,7 +21,6 @@ services:
 
 databases:
   - name: vivra-db
+    plan: free
     databaseName: vivra
     user: vivra_user
-    plan: free
-    engine: mysql
