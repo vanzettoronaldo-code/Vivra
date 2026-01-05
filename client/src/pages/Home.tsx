@@ -113,7 +113,11 @@ export default function Home() {
               <span className="text-2xl font-bold text-slate-900">VIVRA</span>
             </div>
             <Button 
-              onClick={() => window.location.href = getLoginUrl()}
+              onClick={() => {
+                const url = getLoginUrl();
+                console.log("Redirecting to:", url);
+                window.location.href = url;
+              }}
               className="bg-blue-600 hover:bg-blue-700"
             >
               {isPortuguese ? "Entrar" : "Sign In"}
@@ -134,7 +138,10 @@ export default function Home() {
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Button 
                 size="lg" 
-                onClick={() => window.location.href = getLoginUrl()}
+                onClick={() => {
+                  const url = getLoginUrl();
+                  window.location.href = url;
+                }}
                 className="bg-blue-600 hover:bg-blue-700 gap-2 text-lg px-8"
               >
                 {isPortuguese ? "Começar Agora" : "Get Started"}
