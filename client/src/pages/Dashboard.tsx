@@ -6,6 +6,8 @@ import { useNotificationSimulator } from "@/hooks/useNotificationSimulator";
 import { Plus, AlertCircle, Building2, X } from "lucide-react";
 import { useState, useMemo } from "react";
 import CreateAssetDialog from "@/components/CreateAssetDialog";
+import { AssetListSkeleton } from "@/components/AssetListSkeleton";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export default function Dashboard() {
   useNotificationSimulator();
@@ -41,10 +43,28 @@ export default function Dashboard() {
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center h-96">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p className="text-slate-600">Carregando ativos...</p>
+      <div className="space-y-6">
+        <div className="flex items-center justify-between">
+          <div className="space-y-2">
+            <Skeleton className="h-10 w-48" />
+            <Skeleton className="h-4 w-64" />
+          </div>
+          <Skeleton className="h-10 w-32" />
+        </div>
+        <div className="grid gap-6">
+          <Card>
+            <CardHeader>
+              <Skeleton className="h-6 w-24" />
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <Skeleton className="h-10 w-full" />
+              <Skeleton className="h-10 w-full" />
+            </CardContent>
+          </Card>
+          <div className="space-y-4">
+            <Skeleton className="h-8 w-48" />
+            <AssetListSkeleton />
+          </div>
         </div>
       </div>
     );
