@@ -8,7 +8,7 @@ export const getLoginUrl = () => {
   const state = btoa(redirectUri);
 
   try {
-    const url = new URL(`${oauthPortalUrl}/app-auth`);
+    const url = new URL(oauthPortalUrl);
     url.searchParams.set("appId", appId);
     url.searchParams.set("redirectUri", redirectUri);
     url.searchParams.set("state", state);
