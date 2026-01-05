@@ -13,7 +13,7 @@ import {
   SidebarTrigger,
   useSidebar,
 } from "@/components/ui/sidebar";
-import { getLoginUrl } from "@/const";
+
 import { useIsMobile } from "@/hooks/useMobile";
 import { LayoutDashboard, LogOut, PanelLeft, Users, Globe, BarChart3, Plus, CheckSquare, Lightbulb, Users2, Settings, TrendingUp, FileText, Plug, Bell, Building2, Home, Briefcase, CalendarDays } from "lucide-react";
 import { NotificationBell } from "./NotificationCenter";
@@ -77,7 +77,7 @@ export default function DashboardLayout({
           </div>
           <Button
             onClick={() => {
-              window.location.href = getLoginUrl();
+              window.location.href = "/login";
             }}
             size="lg"
             className="w-full shadow-lg hover:shadow-xl transition-all"

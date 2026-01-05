@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useLanguage } from "@/contexts/LanguageContext";
-import { Link } from "wouter";
+import { useLocation } from "wouter";
 import { 
   BarChart3, 
   Shield, 
@@ -24,6 +24,7 @@ import {
 
 export default function Home() {
   const { language } = useLanguage();
+  const [, setLocation] = useLocation();
   const isPortuguese = language === "pt-BR";
   const [email, setEmail] = useState("");
   const [subscribed, setSubscribed] = useState(false);
@@ -112,11 +113,12 @@ export default function Home() {
               <img src="/logo-vivra.png" alt="VIVRA" className="h-10 w-10" />
               <span className="text-2xl font-bold text-slate-900">VIVRA</span>
             </div>
-            <Link href="/login">
-              <Button className="bg-blue-600 hover:bg-blue-700">
-                {isPortuguese ? "Entrar" : "Sign In"}
-              </Button>
-            </Link>
+            <Button 
+              onClick={() => setLocation("/login")}
+              className="bg-blue-600 hover:bg-blue-700"
+            >
+              {isPortuguese ? "Entrar" : "Sign In"}
+            </Button>
           </nav>
 
           <div className="max-w-4xl mx-auto text-center py-16">
@@ -131,15 +133,14 @@ export default function Home() {
                 : "Intelligent platform for recording, analyzing and managing the technical history of your physical assets. Identify patterns, prevent failures and make data-driven decisions."}
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Link href="/register">
-                <Button 
-                  size="lg" 
-                  className="bg-blue-600 hover:bg-blue-700 gap-2 text-lg px-8"
-                >
-                  {isPortuguese ? "Começar Agora" : "Get Started"}
-                  <ArrowRight className="w-5 h-5" />
-                </Button>
-              </Link>
+              <Button 
+                size="lg" 
+                onClick={() => setLocation("/register")}
+                className="bg-blue-600 hover:bg-blue-700 gap-2 text-lg px-8"
+              >
+                {isPortuguese ? "Começar Agora" : "Get Started"}
+                <ArrowRight className="w-5 h-5" />
+              </Button>
               <Button 
                 size="lg" 
                 variant="outline"
@@ -306,7 +307,7 @@ export default function Home() {
           <Button 
             size="lg" 
             variant="secondary"
-            onClick={() => window.location.href = getLoginUrl()}
+            onClick={() => setLocation("/register")}
             className="gap-2 text-lg px-8"
           >
             {isPortuguese ? "Criar Conta Gratuita" : "Create Free Account"}
@@ -389,15 +390,15 @@ export default function Home() {
               © {new Date().getFullYear()} VIVRA. {isPortuguese ? "Todos os direitos reservados." : "All rights reserved."}
             </p>
             <div className="flex gap-6 text-sm">
-              <button onClick={() => window.location.href = getLoginUrl()} className="hover:text-white transition-colors">
+              <a href="#" className="hover:text-white transition-colors">
                 {isPortuguese ? "Termos de Uso" : "Terms of Service"}
-              </button>
-              <button onClick={() => window.location.href = getLoginUrl()} className="hover:text-white transition-colors">
+              </a>
+              <a href="#" className="hover:text-white transition-colors">
                 {isPortuguese ? "Privacidade" : "Privacy"}
-              </button>
-              <button onClick={() => window.location.href = getLoginUrl()} className="hover:text-white transition-colors">
+              </a>
+              <a href="#" className="hover:text-white transition-colors">
                 {isPortuguese ? "Contato" : "Contact"}
-              </button>
+              </a>
             </div>
           </div>
         </div>
