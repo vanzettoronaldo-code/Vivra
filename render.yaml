@@ -3,8 +3,8 @@ services:
     name: vivra-app
     env: node
     plan: free
-    buildCommand: pnpm install && pnpm build
-    startCommand: pnpm start
+    buildCommand: pnpm install && vite build && esbuild server/_core/index.ts --platform=node --packages=external --bundle --format=esm --outdir=dist
+    startCommand: pnpm db:push && pnpm start
     envVars:
       - key: NODE_ENV
         value: production
