@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useLanguage } from "@/contexts/LanguageContext";
-import { getLoginUrl } from "@/const";
+import { Link } from "wouter";
 import { 
   BarChart3, 
   Shield, 
@@ -112,16 +112,11 @@ export default function Home() {
               <img src="/logo-vivra.png" alt="VIVRA" className="h-10 w-10" />
               <span className="text-2xl font-bold text-slate-900">VIVRA</span>
             </div>
-            <Button 
-              onClick={() => {
-                const url = getLoginUrl();
-                console.log("Redirecting to:", url);
-                window.location.href = url;
-              }}
-              className="bg-blue-600 hover:bg-blue-700"
-            >
-              {isPortuguese ? "Entrar" : "Sign In"}
-            </Button>
+            <Link href="/login">
+              <Button className="bg-blue-600 hover:bg-blue-700">
+                {isPortuguese ? "Entrar" : "Sign In"}
+              </Button>
+            </Link>
           </nav>
 
           <div className="max-w-4xl mx-auto text-center py-16">
@@ -136,17 +131,15 @@ export default function Home() {
                 : "Intelligent platform for recording, analyzing and managing the technical history of your physical assets. Identify patterns, prevent failures and make data-driven decisions."}
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Button 
-                size="lg" 
-                onClick={() => {
-                  const url = getLoginUrl();
-                  window.location.href = url;
-                }}
-                className="bg-blue-600 hover:bg-blue-700 gap-2 text-lg px-8"
-              >
-                {isPortuguese ? "Começar Agora" : "Get Started"}
-                <ArrowRight className="w-5 h-5" />
-              </Button>
+              <Link href="/register">
+                <Button 
+                  size="lg" 
+                  className="bg-blue-600 hover:bg-blue-700 gap-2 text-lg px-8"
+                >
+                  {isPortuguese ? "Começar Agora" : "Get Started"}
+                  <ArrowRight className="w-5 h-5" />
+                </Button>
+              </Link>
               <Button 
                 size="lg" 
                 variant="outline"

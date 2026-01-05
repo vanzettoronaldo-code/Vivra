@@ -27,6 +27,8 @@ import DashboardOverview from "./pages/DashboardOverview";
 import ServiceProviders from "./pages/ServiceProviders";
 import ServiceProviderDetail from "./pages/ServiceProviderDetail";
 import ServiceCalendar from "./pages/ServiceCalendar";
+import Login from "./pages/Login";
+import Register from "./pages/Register";
 
 function Router() {
   const { isAuthenticated, loading } = useAuth();
@@ -43,6 +45,8 @@ function Router() {
     return (
       <Switch>
         <Route path={"/"} component={Home} />
+        <Route path={"/login"} component={Login} />
+        <Route path={"/register"} component={Register} />
         <Route path={"/404"} component={NotFound} />
         <Route component={NotFound} />
       </Switch>
