@@ -10,21 +10,24 @@ let _db: ReturnType<typeof drizzle> | null = null;
 export async function getDb() {
   if (!_db && process.env.DATABASE_URL) {
     try {
-      const connection = await mysql.createConnection({
-        uri: process.env.DATABASE_URL,
-        ssl: {
-          rejectUnauthorized: true,
-        },
-      });
+      // FIX: Garante que a string de conexão tenha as configurações de SSL necessárias para o TiDB
+      let connectionString = process.env.DATABASE_URL;
+      
+      // Verifica se já tem configuração de SSL, se não, adiciona
+      if (!connectionString.includes("ssl=")) {
+        const separator = connectionString.includes("?") ? "&" : "?";
+        // Adiciona ssl={"rejectUnauthorized":true} ao final da URL
+        connectionString += `${separator}ssl={"rejectUnauthorized":true}`;
+      }
+
+      // Cria a conexão usando a string corrigida
+      const connection = await mysql.createConnection(connectionString);
+      
       _db = drizzle(connection);
     } catch (error) {
-      console.warn("[Database] Failed to connect with SSL, trying without SSL:", error);
-      try {
-        _db = drizzle(process.env.DATABASE_URL);
-      } catch (innerError) {
-        console.warn("[Database] Failed to connect even without SSL:", innerError);
-        _db = null;
-      }
+      console.error("[Database] Failed to connect:", error);
+      // Não tentamos o fallback inseguro aqui porque o TiDB exige SSL
+      throw error; 
     }
   }
   return _db;
