@@ -17,4 +17,4 @@ services:
       - key: VITE_OAUTH_PORTAL_URL
         value: https://oauth.manus.im
       - key: VITE_APP_ID
-        value: vivra
+        value: vivra-app-production
