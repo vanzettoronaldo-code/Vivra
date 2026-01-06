@@ -2,6 +2,7 @@ import { useParams, useLocation } from "wouter";
 import { trpc } from "@/lib/trpc";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Skeleton } from "@/components/ui/skeleton";
 import { ArrowLeft, Plus } from "lucide-react";
 import TimelineView from "@/components/TimelineView";
 import TimelineFilters, { TimelineFilterState } from "@/components/TimelineFilters";
