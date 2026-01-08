@@ -24,19 +24,34 @@ import { DashboardLayoutSkeleton } from './DashboardLayoutSkeleton';
 import { Button } from "./ui/button";
 import { SettingsDialog } from "./SettingsDialog";
 
-const menuItems = [
-  { icon: Home, label: "VISAO GERAL", path: "/visao-geral" },
-  { icon: Building2, label: "ATIVOS", path: "/" },
-  { icon: Plus, label: "+ NOVOS REGISTROS", path: "/quick-record" },
-  { icon: CheckSquare, label: "APROVACOES", path: "/approval-notifications" },
-  { icon: Briefcase, label: "PRESTADORES", path: "/prestadores" },
-  { icon: CalendarDays, label: "CALENDARIO", path: "/calendario" },
-  { icon: Lightbulb, label: "INTELIGENCIA", path: "/inteligencia" },
-  { icon: TrendingUp, label: "METRICAS", path: "/metricas" },
-  { icon: FileText, label: "RELATORIOS", path: "/relatorios-agendados" },
-  { icon: Plug, label: "INTEGRACOES", path: "/integracoes" },
-  { icon: Bell, label: "ALERTAS", path: "/alertas" },
-  { icon: Users2, label: "EQUIPE", path: "/team" },
+const menuGroups = [
+  {
+    title: "OPERAÇÃO",
+    items: [
+      { icon: Building2, label: "ATIVOS", path: "/" },
+      { icon: Plus, label: "+ NOVOS REGISTROS", path: "/quick-record" },
+      { icon: CheckSquare, label: "APROVACOES", path: "/approval-notifications" },
+      { icon: Briefcase, label: "PRESTADORES", path: "/prestadores" },
+      { icon: CalendarDays, label: "CALENDARIO", path: "/calendario" },
+    ]
+  },
+  {
+    title: "GESTÃO À VISTA",
+    items: [
+      { icon: Home, label: "VISAO GERAL", path: "/visao-geral" },
+      { icon: Lightbulb, label: "INTELIGENCIA", path: "/inteligencia" },
+      { icon: TrendingUp, label: "METRICAS", path: "/metricas" },
+      { icon: FileText, label: "RELATORIOS", path: "/relatorios-agendados" },
+    ]
+  },
+  {
+    title: "CONFIGURAÇÕES",
+    items: [
+      { icon: Plug, label: "INTEGRACOES", path: "/integracoes" },
+      { icon: Bell, label: "ALERTAS", path: "/alertas" },
+      { icon: Users2, label: "EQUIPE", path: "/team" },
+    ]
+  }
 ];
 
 const SIDEBAR_WIDTH_KEY = "sidebar-width";
@@ -207,27 +222,34 @@ function DashboardLayoutContent({
             </div>
           </SidebarHeader>
 
-          <SidebarContent className="gap-0">
-            <SidebarMenu className="px-2 py-1">
-              {menuItems.map(item => {
-                const isActive = location === item.path;
-                return (
-                  <SidebarMenuItem key={item.path}>
-                    <SidebarMenuButton
-                      isActive={isActive}
-                      onClick={() => setLocation(item.path)}
-                      tooltip={item.label}
-                      className={`h-10 transition-all font-normal`}
-                    >
-                      <item.icon
-                        className={`h-4 w-4 ${isActive ? "text-primary" : ""}`}
-                      />
-                      <span>{item.label}</span>
-                    </SidebarMenuButton>
-                  </SidebarMenuItem>
-                );
-              })}
-            </SidebarMenu>
+          <SidebarContent className="gap-4 py-4">
+            {menuGroups.map((group) => (
+              <div key={group.title} className="px-2">
+                <h3 className="px-3 text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">
+                  {group.title}
+                </h3>
+                <SidebarMenu>
+                  {group.items.map((item) => {
+                    const isActive = location === item.path;
+                    return (
+                      <SidebarMenuItem key={item.path}>
+                        <SidebarMenuButton
+                          isActive={isActive}
+                          onClick={() => setLocation(item.path)}
+                          tooltip={item.label}
+                          className={`h-9 transition-all font-normal`}
+                        >
+                          <item.icon
+                            className={`h-4 w-4 ${isActive ? "text-primary" : ""}`}
+                          />
+                          <span>{item.label}</span>
+                        </SidebarMenuButton>
+                      </SidebarMenuItem>
+                    );
+                  })}
+                </SidebarMenu>
+              </div>
+            ))}
           </SidebarContent>
 
           <SidebarFooter className="p-3">

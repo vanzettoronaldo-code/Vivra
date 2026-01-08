@@ -34,11 +34,16 @@ export default function Home() {
     e.preventDefault();
     if (!email) return;
     
-    setSubscribing(true);
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    setSubscribed(true);
-    setSubscribing(false);
+    try {
+      setSubscribing(true);
+      // Simulate API call
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      setSubscribed(true);
+    } catch (error) {
+      console.error("Subscription failed", error);
+    } finally {
+      setSubscribing(false);
+    }
   };
 
   const features = [
