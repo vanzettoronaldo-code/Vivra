@@ -11,11 +11,16 @@ export function DashboardLayoutSkeleton() {
           <Skeleton className="h-4 w-24" />
         </div>
 
-        {/* Menu items */}
-        <div className="space-y-2 px-2">
-          <Skeleton className="h-10 w-full rounded-lg" />
-          <Skeleton className="h-10 w-full rounded-lg" />
-          <Skeleton className="h-10 w-full rounded-lg" />
+        {/* Menu items in quadrants */}
+        <div className="space-y-6 px-2">
+          {[1, 2, 3].map((i) => (
+            <div key={i} className="space-y-2">
+              <Skeleton className="h-3 w-16 mb-3" />
+              <Skeleton className="h-9 w-full rounded-lg" />
+              <Skeleton className="h-9 w-full rounded-lg" />
+              <Skeleton className="h-9 w-full rounded-lg" />
+            </div>
+          ))}
         </div>
 
         {/* User profile area at bottom */}
