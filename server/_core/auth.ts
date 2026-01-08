@@ -72,17 +72,21 @@ export function registerAuthRoutes(app: Express) {
 
   // Login user
   app.post("/api/auth/login", async (req: Request, res: Response) => {
+    console.log(`[Auth] Login attempt for email: ${req.body?.email}`);
     try {
       const { email, password } = req.body;
 
       if (!email || !password) {
+        console.warn("[Auth] Login failed: Missing email or password");
         res.status(400).json({ error: "Email e senha são obrigatórios" });
         return;
       }
 
       // Find user by email
+      console.log("[Auth] Fetching user from DB...");
       const user = await db.getUserByEmail(email);
       if (!user) {
+        console.warn(`[Auth] Login failed: User not found for email ${email}`);
         res.status(401).json({ error: "Email ou senha incorretos" });
         return;
       }
@@ -94,19 +98,23 @@ export function registerAuthRoutes(app: Express) {
       }
 
       // Verify password
+      console.log("[Auth] Verifying password...");
       const isValidPassword = await bcrypt.compare(password, user.passwordHash);
       if (!isValidPassword) {
+        console.warn(`[Auth] Login failed: Invalid password for email ${email}`);
         res.status(401).json({ error: "Email ou senha incorretos" });
         return;
       }
 
       // Update last signed in
+      console.log("[Auth] Updating last signed in...");
       await db.upsertUser({
         openId: user.openId,
         lastSignedIn: new Date(),
       });
 
       // Create session token
+      console.log("[Auth] Creating session token...");
       const sessionToken = await sdk.createSessionToken(user.openId, {
         name: user.name || "",
         expiresInMs: ONE_YEAR_MS,
