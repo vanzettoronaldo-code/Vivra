@@ -24,10 +24,12 @@ export async function getDb() {
       const connection = await mysql.createConnection(connectionString);
       
       _db = drizzle(connection);
+      console.log("[Database] Connected successfully");
     } catch (error) {
       console.error("[Database] Failed to connect:", error);
+      console.warn("[Database] Server will continue without database connection");
       // Não tentamos o fallback inseguro aqui porque o TiDB exige SSL
-      throw error; 
+      // Mas também não lançamos o erro para não bloquear o servidor
     }
   }
   return _db;
