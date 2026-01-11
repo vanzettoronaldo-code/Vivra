@@ -492,7 +492,7 @@ export const appRouter = router({
       }),
   }),
 
-  /**
+/**
    * Services procedures
    */
   service: router({
@@ -513,6 +513,20 @@ export const appRouter = router({
         return getServiceById(input.id);
       }),
     
+    // ROTA NOVA: Autenticação da OS
+    authenticate: protectedProcedure
+      .input(z.object({
+        id: z.number(),
+        signature: z.string().min(1, "Assinatura é obrigatória"), // Pode ser um hash, nome digitado ou token
+      }))
+      .mutation(async ({ ctx, input }) => {
+        if (!ctx.user.companyId) throw new TRPCError({ code: "UNAUTHORIZED" });
+        
+        // Chama a função nova do DB que atualiza a OS com os dados de quem autenticou
+        // import { authenticateService } from "./db"; (Certifique-se de importar lá em cima)
+        return authenticateService(input.id, ctx.user.id, input.signature);
+      }),
+
     create: protectedProcedure
       .input(z.object({
         providerId: z.number(),
@@ -534,7 +548,7 @@ export const appRouter = router({
         id: z.number(),
         title: z.string().min(1).optional(),
         description: z.string().optional(),
-        status: z.enum(["pendente", "andamento", "aprovado", "rejeitado"]).optional(),
+        status: z.enum(["pendente", "andamento", "aprovado", "rejeitado", "concluido"]).optional(),
         priority: z.enum(["baixa", "media", "alta", "urgente"]).optional(),
         scheduledDate: z.date().optional(),
         completedDate: z.date().optional(),
