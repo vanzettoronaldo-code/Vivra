@@ -183,7 +183,6 @@ export const approvalRequests = mysqlTable("approval_requests", {
 export type ApprovalRequest = typeof approvalRequests.$inferSelect;
 export type InsertApprovalRequest = typeof approvalRequests.$inferInsert;
 
-
 /**
  * Audit logs - track all critical actions for compliance and traceability
  */
@@ -225,7 +224,6 @@ export const emailNotifications = mysqlTable("email_notifications", {
 export type EmailNotification = typeof emailNotifications.$inferSelect;
 export type InsertEmailNotification = typeof emailNotifications.$inferInsert;
 
-
 /**
  * Service Providers - Prestadores de serviços
  */
@@ -238,7 +236,7 @@ export const serviceProviders = mysqlTable("service_providers", {
   phone: varchar("phone", { length: 20 }),
   document: varchar("document", { length: 20 }), // CNPJ ou CPF
   address: text("address"),
-  rating: decimal("rating", { precision: 2, scale: 1 }).default("0.0"),
+  rating: decimal("rating", { precision: 2, scale: 1 }).default("0.0"), // Ranking geral do prestador
   totalServices: int("totalServices").default(0).notNull(),
   isActive: boolean("isActive").default(true).notNull(),
   notes: text("notes"),
@@ -250,22 +248,31 @@ export type ServiceProvider = typeof serviceProviders.$inferSelect;
 export type InsertServiceProvider = typeof serviceProviders.$inferInsert;
 
 /**
- * Services - Serviços prestados
+ * Services - Serviços prestados (Ordens de Serviço)
  */
 export const services = mysqlTable("services", {
   id: int("id").autoincrement().primaryKey(),
   companyId: int("companyId").notNull(),
-  providerId: int("providerId").notNull(),
-  assetId: int("assetId"), // Ativo relacionado (opcional)
+  providerId: int("providerId").notNull(), // Link para o Prestador
+  assetId: int("assetId"), // Link para o Ativo (para ranking por ativo)
   title: varchar("title", { length: 255 }).notNull(),
   description: text("description"),
-  status: mysqlEnum("status", ["pendente", "andamento", "aprovado", "rejeitado"]).default("pendente").notNull(),
+  status: mysqlEnum("status", ["pendente", "andamento", "aprovado", "rejeitado", "concluido"]).default("pendente").notNull(),
   priority: mysqlEnum("priority", ["baixa", "media", "alta", "urgente"]).default("media").notNull(),
   scheduledDate: timestamp("scheduledDate"),
   completedDate: timestamp("completedDate"),
   cost: decimal("cost", { precision: 10, scale: 2 }),
-  rating: int("rating"), // 1-5 stars
+  
+  // Avaliação do Serviço (usado para o ranking)
+  rating: int("rating"), // 1-5 estrelas
   feedback: text("feedback"),
+  
+  // Autenticação da Execução (Novos campos)
+  isAuthenticated: boolean("isAuthenticated").default(false).notNull(), // Flag de autenticação
+  authenticatedAt: timestamp("authenticatedAt"), // Quando foi autenticado
+  authenticatedBy: int("authenticatedBy"), // ID do usuário que assinou/autenticou
+  authenticationSignature: varchar("authenticationSignature", { length: 512 }), // Assinatura digital ou hash
+  
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
 });
