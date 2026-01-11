@@ -1,14 +1,12 @@
-import { jsxLocPlugin } from "@builder.io/vite-plugin-jsx-loc";
 import tailwindcss from "@tailwindcss/vite";
 import react from "@vitejs/plugin-react";
-import fs from "node:fs";
 import path from "path";
 import { defineConfig } from "vite";
 
-const plugins = [react(), tailwindcss(), jsxLocPlugin()];
+// Removido: jsxLocPlugin (causava erro)
 
 export default defineConfig({
-  plugins,
+  plugins: [react(), tailwindcss()], // Apenas os plugins essenciais
   resolve: {
     alias: {
       "@": path.resolve(import.meta.dirname, "client", "src"),
@@ -22,18 +20,13 @@ export default defineConfig({
   build: {
     outDir: path.resolve(import.meta.dirname, "dist/public"),
     emptyOutDir: true,
+    // Adicionei isso para evitar o aviso de tamanho de arquivo que você viu antes
+    chunkSizeWarningLimit: 1000, 
   },
   server: {
     host: true,
-    allowedHosts: [
-      ".manuspre.computer",
-      ".manus.computer",
-      ".manus-asia.computer",
-      ".manuscomputer.ai",
-      ".manusvm.computer",
-      "localhost",
-      "127.0.0.1",
-    ],
+    // Limpeza: removidos os domínios do manus. Basta permitir localhost e rede local.
+    allowedHosts: ["localhost", "127.0.0.1"], 
     fs: {
       strict: true,
       deny: ["**/.*"],
